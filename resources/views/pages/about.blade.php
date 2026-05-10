@@ -77,7 +77,7 @@
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-14 lg:py-16">
           <p class="text-sm font-medium text-slate-500"><a href="{{ route('home') }}" class="hover:text-brand-blue">Home</a> / About Us</p>
           <div class="mt-5">
-            <h1 class="max-w-4xl text-[2.1rem] font-black leading-[1.05] text-brand-blue sm:text-[2.7rem] lg:text-[3.5rem]">Strategic partner for digital transformation through IT Training and IT Outsourcing.</h1>
+            <h1 class="max-w-4xl text-[2.1rem] font-black leading-[1.05] text-brand-blue sm:text-[2.7rem] lg:text-[3.5rem]">{{ $page?->hero_title ?? 'Strategic partner for digital transformation through IT Training and IT Outsourcing.' }}</h1>
           </div>
         </div>
       </section>
@@ -87,17 +87,17 @@
           <div class="space-y-6">
             <article class="panel-card rounded-[28px] p-7 pt-8 sm:p-8 sm:pt-9">
               <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Who We Are</p>
-              <p class="mt-4 text-lg leading-8 text-slate-600">PT. Systech Talenta Digital (DigiTalent) is a technology company and strategic partner for digital transformation. We focus on two core services: IT Training and IT Outsourcing. We believe digital progress depends on skilled people who can adapt and perform in real environments.</p>
+              <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $sections['who_we_are']->section_description ?? 'PT. Systech Talenta Digital (DigiTalent) is a technology company and strategic partner for digital transformation. We focus on two core services: IT Training and IT Outsourcing. We believe digital progress depends on skilled people who can adapt and perform in real environments.' !!}</div>
             </article>
 
             <article class="panel-card rounded-[28px] p-7 pt-8 sm:p-8 sm:pt-9">
               <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Where We Come From</p>
-              <p class="mt-4 text-lg leading-8 text-slate-600">DigiTalent is part of SGI Asia Group, an IT group established in 2013. We originated from the training division of PT. Systech Global Informasi and later became an independent company. With strong industry experience and networks, we address two key needs: developing competent professionals and providing industry-ready talent. Our goal is to connect industry demands with available skills through structured training and reliable outsourcing services.</p>
+              <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $sections['where_we_come_from']->section_description ?? 'DigiTalent is part of SGI Asia Group, an IT group established in 2013. We originated from the training division of PT. Systech Global Informasi and later became an independent company. With strong industry experience and networks, we address two key needs: developing competent professionals and providing industry-ready talent. Our goal is to connect industry demands with available skills through structured training and reliable outsourcing services.' !!}</div>
             </article>
 
             <article class="panel-card rounded-[28px] p-7 pt-8 sm:p-8 sm:pt-9">
               <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Our Commitment</p>
-              <p class="mt-4 text-lg leading-8 text-slate-600">Our commitment is to bridge the gap between industry demands and talent availability. Through structured training programs and flexible, trusted outsourcing services, we empower individuals and organizations to excel in a competitive digital future.</p>
+              <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $sections['commitment']->section_description ?? 'Our commitment is to bridge the gap between industry demands and talent availability. Through structured training programs and flexible, trusted outsourcing services, we empower individuals and organizations to excel in a competitive digital future.' !!}</div>
             </article>
           </div>
 

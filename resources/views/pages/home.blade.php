@@ -1,6 +1,55 @@
 @extends('layouts.app')
 
 @section('content')
+
+@php
+  $coreValuesBlock = $sections['core_values'] ?? null;
+  $coreValuesItems = $coreValuesBlock?->items ?? collect();
+  $progressCounterBlock = $sections['progress_counter'] ?? null;
+  $progressCounterItems = $sections['progress_counter']->items ?? collect();
+  $whyChooseBlock = $sections['why_choose_us'] ?? null;
+  $whyChooseItems = $sections['why_choose_us']->items ?? collect();
+  $faqBlock = $sections['cta'] ?? null;
+  $faqItems = $sections['cta']->items ?? collect();
+
+  $defaultHeroSlides = [
+    'https://smb.telkomuniversity.ac.id/wp-content/uploads/2024/08/Kegiatan-Mahasiswa-Selain-Kuliah-Ini-6-Rekomendasinya.jpg',
+    'https://smb.telkomuniversity.ac.id/wp-content/uploads/2025/11/YK-17.jpg',
+    'https://smb.telkomuniversity.ac.id/wp-content/uploads/2025/11/YK-11.jpg',
+  ];
+
+  $heroSlides = collect();
+
+  if ($page) {
+    $heroSlides = collect([
+      $page->getFirstMediaUrl('hero_image_1', 'web') ?: $page->getFirstMediaUrl('hero_image_1'),
+      $page->getFirstMediaUrl('hero_image_2', 'web') ?: $page->getFirstMediaUrl('hero_image_2'),
+      $page->getFirstMediaUrl('hero_image_3', 'web') ?: $page->getFirstMediaUrl('hero_image_3'),
+    ])
+      ->filter()
+      ->values();
+
+    if ($heroSlides->isEmpty()) {
+      $heroSlides = $page->getMedia('hero_images')
+        ->map(fn ($media) => $media->hasGeneratedConversion('web') ? $media->getUrl('web') : $media->getUrl())
+        ->filter()
+        ->take(3)
+        ->values();
+    }
+
+    if ($heroSlides->isEmpty()) {
+      $heroBackground = $page->getFirstMediaUrl('hero_background', 'web') ?: $page->getFirstMediaUrl('hero_background');
+
+      if (filled($heroBackground)) {
+        $heroSlides = collect([$heroBackground]);
+      }
+    }
+  }
+
+  if ($heroSlides->isEmpty()) {
+    $heroSlides = collect($defaultHeroSlides);
+  }
+@endphp
 <style>
 
       html { scroll-behavior: smooth; }
@@ -34,8 +83,8 @@
         }
       }
       .reveal {
-        opacity: 0;
-        transform: translateY(24px);
+        opacity: 1;
+        transform: translateY(0);
         transition: opacity 760ms cubic-bezier(0.22, 1, 0.36, 1), transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
       }
       .reveal.is-visible {
@@ -43,8 +92,8 @@
         transform: translateY(0);
       }
       .stagger-group .stagger-item {
-        opacity: 0;
-        transform: translateY(24px);
+        opacity: 1;
+        transform: translateY(0);
         transition: opacity 720ms cubic-bezier(0.22, 1, 0.36, 1), transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
       }
       .stagger-group.is-visible .stagger-item {
@@ -430,14 +479,14 @@
 
       <section class="hero-entrance overflow-hidden border-b border-sky-100">
         <div class="hero-background" aria-hidden="true">
-          <div class="hero-bg-slide is-active" data-desktop="https://smb.telkomuniversity.ac.id/wp-content/uploads/2024/08/Kegiatan-Mahasiswa-Selain-Kuliah-Ini-6-Rekomendasinya.jpg" data-mobile="https://smb.telkomuniversity.ac.id/wp-content/uploads/2024/08/Kegiatan-Mahasiswa-Selain-Kuliah-Ini-6-Rekomendasinya-1024x576.jpg" style="background-image: url('https://smb.telkomuniversity.ac.id/wp-content/uploads/2024/08/Kegiatan-Mahasiswa-Selain-Kuliah-Ini-6-Rekomendasinya.jpg')"></div>
-          <div class="hero-bg-slide" data-desktop="https://smb.telkomuniversity.ac.id/wp-content/uploads/2025/11/YK-17.jpg" data-mobile="https://smb.telkomuniversity.ac.id/wp-content/uploads/2025/11/YK-17-1024x576.jpg" style="background-image: url('https://smb.telkomuniversity.ac.id/wp-content/uploads/2025/11/YK-17.jpg')"></div>
-          <div class="hero-bg-slide" data-desktop="https://smb.telkomuniversity.ac.id/wp-content/uploads/2025/11/YK-11.jpg" data-mobile="https://smb.telkomuniversity.ac.id/wp-content/uploads/2025/11/YK-11-1024x576.jpg" style="background-image: url('https://smb.telkomuniversity.ac.id/wp-content/uploads/2025/11/YK-11.jpg')"></div>
+          @foreach ($heroSlides as $index => $slideUrl)
+            <div class="hero-bg-slide {{ $index === 0 ? 'is-active' : '' }}" style="background-image: url('{{ $slideUrl }}')"></div>
+          @endforeach
           <div class="hero-overlay"></div>
         </div>
         <div class="hero-content mx-auto max-w-7xl px-4 py-10 sm:py-14 lg:py-24">
           <div>
-            <h1 class="max-w-4xl text-[2.25rem] font-black leading-[1.02] text-white sm:text-[2.9rem] lg:text-[4.1rem]" data-hero-item="title">Empowering Digital Talent, Enabling Global Success</h1>
+            <h1 class="max-w-4xl text-[2.25rem] font-black leading-[1.02] text-white sm:text-[2.9rem] lg:text-[4.1rem]" data-hero-item="title">{{ $page?->hero_title ?? 'Empowering Digital Talent, Enabling Global Success' }}</h1>
             <div class="mt-8 flex flex-col gap-3 sm:flex-row" data-hero-item="cta">
               <a class="cta-button rounded-full bg-brand-blue px-6 py-3.5 text-center font-bold text-white shadow-soft hover:bg-brand-navy hover:text-white" href="{{ route('services') }}">Explore Services</a>
               <a class="cta-button rounded-full border border-white/60 bg-white/20 px-6 py-3.5 text-center font-bold text-white hover:bg-white hover:text-brand-blue" href="{{ route('contact') }}">Free Consultation</a>
@@ -457,56 +506,54 @@
         </div>
       </section>
 
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const slides = Array.from(document.querySelectorAll('.hero-bg-slide'));
+
+          if (slides.length <= 1) {
+            return;
+          }
+
+          let active = 0;
+
+          setInterval(() => {
+            slides[active].classList.remove('is-active');
+            active = (active + 1) % slides.length;
+            slides[active].classList.add('is-active');
+          }, 5000);
+        });
+      </script>
+
       <section class="section-shell reveal bg-[linear-gradient(180deg,_rgba(255,255,255,0.94),_rgba(236,248,255,0.55))] py-14 sm:py-16 lg:py-20">
         <div class="mx-auto max-w-7xl px-4">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Core Values</p>
-              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">The values shaping how DigiTalent works.</h2>
+              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $coreValuesBlock?->section_title ?: 'The values shaping how DigiTalent works.' }}</h2>
             </div>
           </div>
 
           <div class="values-grid stagger-group mt-8">
-            <article class="value-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <div class="value-meta">
-                <!-- <p class="value-index text-sm font-extrabold">01</p> -->
-                <img class="value-icon" src="/template/Logo/assets/Core Values/Integrity.png" alt="Integrity icon" loading="lazy" />
-              </div>
-              <h3 class="mt-4 text-[1.65rem] font-black leading-tight text-brand-blue">Integrity</h3>
-              <p class="value-copy mt-4 text-lg leading-8">Upholding honesty, responsibility, and professional ethics.</p>
-            </article>
-            <article class="value-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <div class="value-meta">
-                <!-- <p class="value-index text-sm font-extrabold">02</p> -->
-                <img class="value-icon" src="/template/Logo/assets/Core Values/Adaptive.png" alt="Adaptive icon" loading="lazy" />
-              </div>
-              <h3 class="mt-4 text-[1.65rem] font-black leading-tight text-brand-blue">Adaptive</h3>
-              <p class="value-copy mt-4 text-lg leading-8">Continuously adapting to the latest technological advancements.</p>
-            </article>
-            <article class="value-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <div class="value-meta">
-                <!-- <p class="value-index text-sm font-extrabold">03</p> -->
-                <img class="value-icon" src="/template/Logo/assets/Core Values/Excellence.png" alt="Excellence icon" loading="lazy" />
-              </div>
-              <h3 class="mt-4 text-[1.65rem] font-black leading-tight text-brand-blue">Excellence</h3>
-              <p class="value-copy mt-4 text-lg leading-8">Committed to delivering the best results and services.</p>
-            </article>
-            <article class="value-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <div class="value-meta">
-                <!-- <p class="value-index text-sm font-extrabold">04</p> -->
-                <img class="value-icon" src="/template/Logo/assets/Core Values/Collaboration.png" alt="Collaboration icon" loading="lazy" />
-              </div>
-              <h3 class="mt-4 text-[1.65rem] font-black leading-tight text-brand-blue">Collaboration</h3>
-              <p class="value-copy mt-4 text-lg leading-8">Building a strong ecosystem bridging academia, professionals, communities, and industry.</p>
-            </article>
-            <article class="value-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <div class="value-meta">
-                <!-- <p class="value-index text-sm font-extrabold">05</p> -->
-                <img class="value-icon" src="/template/Logo/assets/Core Values/Empowerment.png" alt="Empowerment icon" loading="lazy" />
-              </div>
-              <h3 class="mt-4 text-[1.65rem] font-black leading-tight text-brand-blue">Empowerment</h3>
-              <p class="value-copy mt-4 text-lg leading-8">Providing opportunities for individuals to grow and create a positive impact in the digital world.</p>
-            </article>
+            @forelse ($coreValuesItems as $item)
+              @php
+                $iconPath = data_get($item->extra, 'icon_path');
+                $iconUrl = filled($iconPath) ? \Illuminate\Support\Facades\Storage::disk('public')->url($iconPath) : null;
+              @endphp
+              <article class="value-card stagger-item rounded-[26px] p-6 sm:p-7">
+                @if (filled($iconUrl))
+                  <div class="value-meta mb-4">
+                    <img src="{{ $iconUrl }}" alt="{{ $item->title }} icon" class="value-icon" loading="lazy" />
+                  </div>
+                @endif
+                <h3 class="mt-1 text-[1.65rem] font-black leading-tight text-brand-blue">{{ $item->title }}</h3>
+                <div class="value-copy mt-4 text-lg leading-8 text-slate-700 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $item->description !!}</div>
+              </article>
+            @empty
+              <article class="value-card stagger-item rounded-[26px] p-6 sm:p-7">
+                <h3 class="mt-1 text-[1.65rem] font-black leading-tight text-brand-blue">Integrity</h3>
+                <p class="value-copy mt-4 text-lg leading-8">Upholding honesty, responsibility, and professional ethics.</p>
+              </article>
+            @endforelse
           </div>
         </div>
       </section>
@@ -515,30 +562,28 @@
         <div class="mx-auto max-w-7xl px-4">
           <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-orange">Progress Counter</p>
+              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-orange">{{ $progressCounterBlock?->section_title ?: 'Progress Counter' }}</p>
             </div>
           </div>
           <div class="stagger-group mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            <article class="stats-card stagger-item rounded-[26px] p-6">
-              <p class="stats-kicker text-xs font-semibold uppercase tracking-[0.18em]">Training</p>
-              <p class="mt-4 text-4xl font-black text-brand-cyan" data-counter="500" data-suffix="+">0+</p>
-              <p class="stats-copy mt-3 text-lg font-bold">Completed Training Participants</p>
-            </article>
-            <article class="stats-card stagger-item rounded-[26px] p-6">
-              <p class="stats-kicker text-xs font-semibold uppercase tracking-[0.18em]">Certification</p>
-              <p class="mt-4 text-4xl font-black text-brand-cyan" data-counter="50" data-suffix="+">0+</p>
-              <p class="stats-copy mt-3 text-lg font-bold">Completed Certifications</p>
-            </article>
-            <article class="stats-card stagger-item rounded-[26px] p-6">
-              <p class="stats-kicker text-xs font-semibold uppercase tracking-[0.18em]">Clients</p>
-              <p class="mt-4 text-4xl font-black text-brand-cyan" data-counter="500" data-suffix="+">0+</p>
-              <p class="stats-copy mt-3 text-lg font-bold">Company Client Participants</p>
-            </article>
-            <article class="stats-card stagger-item rounded-[26px] p-6">
-              <p class="stats-kicker text-xs font-semibold uppercase tracking-[0.18em]">Programs</p>
-              <p class="mt-4 text-4xl font-black text-brand-cyan" data-counter="100" data-suffix="+">0+</p>
-              <p class="stats-copy mt-3 text-lg font-bold">Total Training Programs</p>
-            </article>
+            @forelse ($progressCounterItems as $item)
+              @php
+                $counterLabel = trim(strip_tags((string) $item->description));
+                $counterNumber = (int) data_get($item->extra, 'counter', 0);
+                $counterSuffix = (string) data_get($item->extra, 'suffix', '+');
+              @endphp
+              <article class="stats-card stagger-item rounded-[26px] p-6">
+                <p class="stats-kicker text-xs font-semibold uppercase tracking-[0.18em]">{{ $counterLabel }}</p>
+                <p class="mt-4 text-4xl font-black text-brand-cyan" data-counter="{{ $counterNumber }}" data-suffix="{{ $counterSuffix }}">0{{ $counterSuffix }}</p>
+                <p class="stats-copy mt-3 text-lg font-bold">{{ $item->title }}</p>
+              </article>
+            @empty
+              <article class="stats-card stagger-item rounded-[26px] p-6">
+                <p class="stats-kicker text-xs font-semibold uppercase tracking-[0.18em]">Training</p>
+                <p class="mt-4 text-4xl font-black text-brand-cyan" data-counter="500" data-suffix="+">0+</p>
+                <p class="stats-copy mt-3 text-lg font-bold">Completed Training Participants</p>
+              </article>
+            @endforelse
           </div>
         </div>
       </section>
@@ -548,31 +593,38 @@
           <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Why Choose Us</p>
-              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">A practical partner for talent development and digital execution.</h2>
+              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $whyChooseBlock?->section_title ?: 'A practical partner for talent development and digital execution.' }}</h2>
             </div>
           </div>
 
           <div class="why-grid stagger-group mt-8">
-            <article class="why-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <h3 class="text-[1.5rem] font-black leading-tight text-brand-blue">Affiliate with SGI Asia as an Authorized CompTIA Partner</h3>
-              <p class="why-copy mt-4 text-lg leading-8">Our curriculum and services align with global standards and remain relevant through current case studies, evolving cyber risks, and real industry needs.</p>
-            </article>
-            <article class="why-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <h3 class="text-[1.5rem] font-black leading-tight text-brand-blue">Experienced Professionals</h3>
-              <p class="why-copy mt-4 text-lg leading-8">DigiTalent is supported by certified experts and practitioners with proven hands-on project experience across real working environments.</p>
-            </article>
-            <article class="why-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <h3 class="text-[1.5rem] font-black leading-tight text-brand-blue">Backed by a Robust Ecosystem</h3>
-              <p class="why-copy mt-4 text-lg leading-8">Through the SGI Asia ecosystem, we gain access to wider client networks and stronger insights into Indonesia's specific IT landscape and requirements.</p>
-            </article>
-            <article class="why-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <h3 class="text-[1.5rem] font-black leading-tight text-brand-blue">Solution-Oriented Approach & Career Support</h3>
-              <p class="why-copy mt-4 text-lg leading-8">We combine practical training, recruitment support, and career development so participants are ready to solve actual IT challenges effectively.</p>
-            </article>
-            <article class="why-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <h3 class="text-[1.5rem] font-black leading-tight text-brand-blue">Unwavering Commitment to Quality</h3>
-              <p class="why-copy mt-4 text-lg leading-8">Every service is delivered with a strong focus on excellence, professionalism, and measurable satisfaction for our partners and clients.</p>
-            </article>
+            @forelse ($whyChooseItems as $item)
+              <article class="why-card stagger-item rounded-[26px] p-6 sm:p-7">
+                <h3 class="text-[1.5rem] font-black leading-tight text-brand-blue">{{ $item->title }}</h3>
+                <div class="why-copy mt-4 text-lg leading-8 text-slate-700 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $item->description !!}</div>
+              </article>
+            @empty
+              <article class="why-card stagger-item rounded-[26px] p-6 sm:p-7">
+                <h3 class="text-[1.5rem] font-black leading-tight text-brand-blue">Affiliate with SGI Asia as an Authorized CompTIA Partner</h3>
+                <p class="why-copy mt-4 text-lg leading-8">Our curriculum and services align with global standards and remain relevant through current case studies, evolving cyber risks, and real industry needs.</p>
+              </article>
+              <article class="why-card stagger-item rounded-[26px] p-6 sm:p-7">
+                <h3 class="text-[1.5rem] font-black leading-tight text-brand-blue">Experienced Professionals</h3>
+                <p class="why-copy mt-4 text-lg leading-8">DigiTalent is supported by certified experts and practitioners with proven hands-on project experience across real working environments.</p>
+              </article>
+              <article class="why-card stagger-item rounded-[26px] p-6 sm:p-7">
+                <h3 class="text-[1.5rem] font-black leading-tight text-brand-blue">Backed by a Robust Ecosystem</h3>
+                <p class="why-copy mt-4 text-lg leading-8">Through the SGI Asia ecosystem, we gain access to wider client networks and stronger insights into Indonesia's specific IT landscape and requirements.</p>
+              </article>
+              <article class="why-card stagger-item rounded-[26px] p-6 sm:p-7">
+                <h3 class="text-[1.5rem] font-black leading-tight text-brand-blue">Solution-Oriented Approach & Career Support</h3>
+                <p class="why-copy mt-4 text-lg leading-8">We combine practical training, recruitment support, and career development so participants are ready to solve actual IT challenges effectively.</p>
+              </article>
+              <article class="why-card stagger-item rounded-[26px] p-6 sm:p-7">
+                <h3 class="text-[1.5rem] font-black leading-tight text-brand-blue">Unwavering Commitment to Quality</h3>
+                <p class="why-copy mt-4 text-lg leading-8">Every service is delivered with a strong focus on excellence, professionalism, and measurable satisfaction for our partners and clients.</p>
+              </article>
+            @endforelse
           </div>
         </div>
       </section>
@@ -581,40 +633,27 @@
         <div class="mx-auto max-w-7xl px-4">
           <div class="mx-auto max-w-5xl">
             <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">FAQ</p>
-            <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">Pertanyaan yang sering ditanyakan</h2>
+            <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $faqBlock?->section_title ?: 'Pertanyaan yang sering ditanyakan' }}</h2>
             <div class="stagger-group mt-8 space-y-4">
-              <details class="faq-item interactive-card stagger-item rounded-[22px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft">
-                <summary class="cursor-pointer list-none text-lg font-bold text-brand-blue">Mengapa training di DigiTalent?</summary>
-                <div class="faq-answer">
-                  <div>
-                    <p class=" leading-7 mt-4 text-slate-600">Program kami disusun praktis, relevan dengan kebutuhan industri, dan didukung trainer berpengalaman serta studi kasus nyata.</p>
+              @forelse ($faqItems as $item)
+                <details class="faq-item interactive-card stagger-item rounded-[22px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft">
+                  <summary class="cursor-pointer list-none text-lg font-bold text-brand-blue">{{ $item->title }}</summary>
+                  <div class="faq-answer">
+                    <div>
+                      <div class="leading-7 mt-4 text-slate-600 cms-richtext">{!! $item->description !!}</div>
+                    </div>
                   </div>
-                </div>
-              </details>
-              <details class="faq-item interactive-card stagger-item rounded-[22px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft">
-                <summary class="cursor-pointer list-none text-lg font-bold text-brand-blue">Bagaimana memilih training yang paling sesuai?</summary>
-                <div class="faq-answer">
-                  <div>
-                    <p class=" leading-7 mt-4 text-slate-600">Tim kami membantu memetakan kebutuhan personal, tim, atau perusahaan agar program yang dipilih tepat sasaran.</p>
+                </details>
+              @empty
+                <details class="faq-item interactive-card stagger-item rounded-[22px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft">
+                  <summary class="cursor-pointer list-none text-lg font-bold text-brand-blue">Mengapa training di DigiTalent?</summary>
+                  <div class="faq-answer">
+                    <div>
+                      <p class="leading-7 mt-4 text-slate-600">Program kami disusun praktis, relevan dengan kebutuhan industri, dan didukung trainer berpengalaman serta studi kasus nyata.</p>
+                    </div>
                   </div>
-                </div>
-              </details>
-              <details class="faq-item interactive-card stagger-item rounded-[22px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft">
-                <summary class="cursor-pointer list-none text-lg font-bold text-brand-blue">Apakah tersedia corporate in-house training?</summary>
-                <div class="faq-answer">
-                  <div>
-                    <p class=" leading-7 mt-4 text-slate-600">Ya, tersedia opsi corporate in-house training dengan kurikulum yang dapat disesuaikan dengan kebutuhan organisasi.</p>
-                  </div>
-                </div>
-              </details>
-              <details class="faq-item interactive-card stagger-item rounded-[22px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft">
-                <summary class="cursor-pointer list-none text-lg font-bold text-brand-blue">Layanan outsourcing mencakup apa saja?</summary>
-                <div class="faq-answer">
-                  <div>
-                    <p class=" leading-7 mt-4 text-slate-600">Kami menyediakan dedicated IT staff, managed IT services, technical support, maintenance, dan project-based IT teams.</p>
-                  </div>
-                </div>
-              </details>
+                </details>
+              @endforelse
             </div>
           </div>
         </div>

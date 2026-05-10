@@ -1,6 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+  $trainingDomainItems = $sections['training_domains']->items ?? collect();
+@endphp
 <style>
 
       body {
@@ -40,7 +43,7 @@
       <section class="border-b border-brand-orange/30 bg-[linear-gradient(160deg,_#f0a530_0%,_#f4b651_46%,_#f8cd85_100%)] py-14 lg:py-20">
         <div class="mx-auto max-w-7xl px-4">
           <p class="text-sm font-medium text-white/92"><a href="{{ route('home') }}" class="hover:text-white">Home</a> / Training</p>
-          <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.05] text-white sm:text-[2.8rem] lg:text-[3.5rem]">Training catalog structured by domain, learning format, and industry relevance.</h1>
+          <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.05] text-white sm:text-[2.8rem] lg:text-[3.5rem]">{{ $page?->hero_title ?? 'Training catalog structured by domain, learning format, and industry relevance.' }}</h1>
           <div class="mt-8 grid max-w-3xl gap-4 sm:grid-cols-2">
             <div class="rounded-[24px] border border-brand-navy/14 bg-white px-5 py-5 shadow-[0_20px_44px_rgba(9,70,138,0.14)]">
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-navy/70">Coverage</p>
@@ -59,54 +62,22 @@
       <section class="bg-[linear-gradient(180deg,_rgba(255,255,255,0.94),_rgba(236,248,255,0.5))] py-14 lg:py-20">
         <div class="mx-auto max-w-7xl px-4">
           <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            <a class="training-card rounded-[26px] p-6 pt-7" href="#">
-              <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain 01</p>
-              <h2 class="mt-4 text-2xl font-black text-brand-blue">GRC</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Governance, Risk, & Compliance programs for security and regulatory readiness.</p>
-              <span class="mt-6 inline-flex text-sm font-bold text-brand-orange">Catalog Link Placeholder</span>
-            </a>
-            <a class="training-card rounded-[26px] p-6 pt-7" href="#">
-              <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain 02</p>
-              <h2 class="mt-4 text-2xl font-black text-brand-blue">IT Operations</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Infrastructure, system operations, and operational reliability learning paths.</p>
-              <span class="mt-6 inline-flex text-sm font-bold text-brand-orange">Catalog Link Placeholder</span>
-            </a>
-            <a class="training-card rounded-[26px] p-6 pt-7" href="#">
-              <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain 03</p>
-              <h2 class="mt-4 text-2xl font-black text-brand-blue">IT Architecture</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Architecture design programs for scalable and business-aligned systems.</p>
-              <span class="mt-6 inline-flex text-sm font-bold text-brand-orange">Catalog Link Placeholder</span>
-            </a>
-            <a class="training-card rounded-[26px] p-6 pt-7" href="#">
-              <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain 04</p>
-              <h2 class="mt-4 text-2xl font-black text-brand-blue">Software Development</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Practical software engineering programs from foundations to advanced delivery.</p>
-              <span class="mt-6 inline-flex text-sm font-bold text-brand-orange">Catalog Link Placeholder</span>
-            </a>
-            <a class="training-card rounded-[26px] p-6 pt-7" href="#">
-              <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain 05</p>
-              <h2 class="mt-4 text-2xl font-black text-brand-blue">Cybersecurity</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Training for cyber defense, threat awareness, and security implementation.</p>
-              <span class="mt-6 inline-flex text-sm font-bold text-brand-orange">Catalog Link Placeholder</span>
-            </a>
-            <a class="training-card rounded-[26px] p-6 pt-7" href="#">
-              <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain 06</p>
-              <h2 class="mt-4 text-2xl font-black text-brand-blue">Management & IT BA</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Programs for business analysis, governance, and managerial IT capability.</p>
-              <span class="mt-6 inline-flex text-sm font-bold text-brand-orange">Catalog Link Placeholder</span>
-            </a>
-            <a class="training-card rounded-[26px] p-6 pt-7" href="#">
-              <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain 07</p>
-              <h2 class="mt-4 text-2xl font-black text-brand-blue">Project Management</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Project planning, delivery control, and execution management for IT teams.</p>
-              <span class="mt-6 inline-flex text-sm font-bold text-brand-orange">Catalog Link Placeholder</span>
-            </a>
-            <a class="training-card rounded-[26px] p-6 pt-7" href="#">
-              <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain 08</p>
-              <h2 class="mt-4 text-2xl font-black text-brand-blue">Data & Artificial Intelligence</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Data analysis, AI literacy, and applied intelligence programs for modern teams.</p>
-              <span class="mt-6 inline-flex text-sm font-bold text-brand-orange">Catalog Link Placeholder</span>
-            </a>
+            @forelse ($trainingDomainItems as $index => $item)
+              <article class="training-card rounded-[26px] p-6 pt-7">
+                <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain {{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</p>
+                <h2 class="mt-4 text-2xl font-black text-brand-blue">{{ $item->title }}</h2>
+                <div class="leading-7 mt-4 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $item->description !!}</div>
+                @if (filled($item->badge))
+                  <span class="mt-6 inline-flex text-sm font-bold text-brand-orange">{{ $item->badge }}</span>
+                @endif
+              </article>
+            @empty
+              <article class="training-card rounded-[26px] p-6 pt-7">
+                <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain 01</p>
+                <h2 class="mt-4 text-2xl font-black text-brand-blue">GRC</h2>
+                <p class="leading-7 mt-4 text-slate-600">Governance, Risk, & Compliance programs for security and regulatory readiness.</p>
+              </article>
+            @endforelse
           </div>
         </div>
       </section>

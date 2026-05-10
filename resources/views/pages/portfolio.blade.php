@@ -191,7 +191,7 @@
       <section class="border-b border-sky-100 bg-[linear-gradient(135deg,_rgba(236,248,255,0.96),_rgba(255,255,255,0.98)_42%,_rgba(127,215,255,0.22)_100%)] py-14 lg:py-20">
         <div class="mx-auto max-w-7xl px-4">
           <p class="text-sm font-medium text-slate-500"><a href="{{ route('home') }}" class="hover:text-brand-blue">Home</a> / Client / Portfolio</p>
-          <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.05] text-brand-blue sm:text-[2.8rem] lg:text-[3.5rem]">Client showcase and training gallery aligned with the website draft structure.</h1>
+          <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.05] text-brand-blue sm:text-[2.8rem] lg:text-[3.5rem]">{{ $page?->hero_title ?? 'Client showcase and training gallery aligned with the website draft structure.' }}</h1>
           <div class="mt-8 grid max-w-3xl gap-4 sm:grid-cols-2">
             <div class="rounded-[24px] border border-brand-blue/15 bg-white/92 px-5 py-5 shadow-soft">
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Presentation Use</p>

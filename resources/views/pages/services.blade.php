@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+  $trainingBlockItems = $sections['training_blocks']->items ?? collect();
+  $outsourcingBlockItems = $sections['outsourcing_blocks']->items ?? collect();
+@endphp
 <style>
 
       html { scroll-behavior: smooth; }
@@ -246,7 +250,7 @@
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-14 lg:py-16">
           <div>
             <p class="text-sm font-medium text-slate-500" data-hero-item="crumb"><a href="{{ route('home') }}" class="hover:text-brand-blue">Home</a> / Services</p>
-            <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.04] text-brand-blue sm:text-[2.8rem] lg:text-[3.6rem]" data-hero-item="title">IT Training and IT Outsourcing</h1>
+            <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.04] text-brand-blue sm:text-[2.8rem] lg:text-[3.6rem]" data-hero-item="title">{{ $page?->hero_title ?? 'IT Training and IT Outsourcing' }}</h1>
             <div class="mt-8 grid max-w-3xl gap-4 sm:grid-cols-2">
               <div class="rounded-[24px] border border-brand-blue/15 bg-white/92 px-5 py-5 shadow-soft">
                 <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Core Services</p>
@@ -270,14 +274,17 @@
           </div>
 
           <div class="overview-grid stagger-group mt-8">
-            <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Fundamental to Advanced Training</p>
-              <p class="detail-copy mt-4 text-lg leading-8">We offer a specialized Mentored Learning system where professionals can learn with flexible schedules and affordable pricing, without compromising on the quality of the learning experience.</p>
-            </article>
-            <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Experienced Instructors</p>
-              <p class="detail-copy mt-4 text-lg leading-8">Our learning process is guided by senior practitioners who are not only globally certified but also possess an average of over 5 years of teaching experience.</p>
-            </article>
+            @forelse ($trainingBlockItems as $item)
+              <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
+                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">{{ $item->title }}</p>
+                <div class="detail-copy mt-4 text-lg leading-8 text-slate-700 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $item->description !!}</div>
+              </article>
+            @empty
+              <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
+                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Fundamental to Advanced Training</p>
+                <p class="detail-copy mt-4 text-lg leading-8">We offer a specialized Mentored Learning system where professionals can learn with flexible schedules and affordable pricing.</p>
+              </article>
+            @endforelse
           </div>
 
           <div class="domain-chart-card reveal mt-8 rounded-[30px] p-5 sm:p-8">
@@ -356,14 +363,17 @@
           </div>
 
           <div class="overview-grid stagger-group mt-8">
-            <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Overview</p>
-              <p class="detail-copy mt-4 text-lg leading-8">We assist companies in sourcing and managing top-tier IT experts for both short-term and long-term engagements.</p>
-            </article>
-            <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Flexible Outsourcing Model</p>
-              <p class="detail-copy mt-4 text-lg leading-8">Through our flexible outsourcing model, we ensure cost efficiency, high-quality performance, and data security.</p>
-            </article>
+            @forelse ($outsourcingBlockItems as $item)
+              <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
+                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">{{ $item->title }}</p>
+                <div class="detail-copy mt-4 text-lg leading-8 text-slate-700 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $item->description !!}</div>
+              </article>
+            @empty
+              <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
+                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Overview</p>
+                <p class="detail-copy mt-4 text-lg leading-8">We assist companies in sourcing and managing top-tier IT experts for both short-term and long-term engagements.</p>
+              </article>
+            @endforelse
           </div>
 
           <div class="reveal mt-8 rounded-[30px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft sm:p-8">

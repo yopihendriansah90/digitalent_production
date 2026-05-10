@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+  $talentProfileItems = $sections['talent_profiles']->items ?? collect();
+  $benefitCardItems = $sections['benefit_cards']->items ?? collect();
+@endphp
 <style>
 
       body {
@@ -60,7 +64,7 @@
       <section class="bg-[linear-gradient(135deg,_#09468a,_#0b6ebd_52%,_#009adf_100%)] py-14 text-white lg:py-20">
         <div class="mx-auto max-w-7xl px-4">
           <p class="text-sm font-medium text-white/70"><a href="{{ route('home') }}" class="hover:text-white">Home</a> / Outsourcing</p>
-          <h1 class="mt-5 max-w-4xl text-[2.1rem] font-black leading-[1.04] sm:text-[2.8rem] lg:text-[3.5rem]">Top-tier IT experts for short-term and long-term business engagements.</h1>
+          <h1 class="mt-5 max-w-4xl text-[2.1rem] font-black leading-[1.04] sm:text-[2.8rem] lg:text-[3.5rem]">{{ $page?->hero_title ?? 'Top-tier IT experts for short-term and long-term business engagements.' }}</h1>
           <div class="mt-8 grid max-w-3xl gap-4 sm:grid-cols-2">
             <div class="rounded-[24px] border border-white/15 bg-white/10 px-5 py-5 backdrop-blur-sm">
               <p class="text-xs font-semibold uppercase tracking-[0.18em] text-white/70">Talent Scope</p>
@@ -77,26 +81,17 @@
       <section class="bg-[linear-gradient(180deg,_rgba(255,255,255,0.94),_rgba(236,248,255,0.5))] py-14 lg:py-20">
         <div class="mx-auto max-w-7xl px-4">
           <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            <article class="outsourcing-card rounded-[26px] p-6 pt-7">
-              <img class="outsourcing-icon" src="/template/Logo/assets/Talent Profiles/Dedicated IT Staff.png" alt="Dedicated IT Staff Icon" />
-              <h2 class="text-2xl font-black text-brand-blue">Dedicated IT Staff</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Programmers, Network Engineers, Data Analysts, and other deployment-ready professionals.</p>
-            </article>
-            <article class="outsourcing-card rounded-[26px] p-6 pt-7">
-              <img class="outsourcing-icon" src="/template/Logo/assets/Talent Profiles/Managed IT Services.png" alt="Managed IT Services Icon" />
-              <h2 class="text-2xl font-black text-brand-blue">Managed IT Services</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Flexible service support for operational continuity and managed execution.</p>
-            </article>
-            <article class="outsourcing-card rounded-[26px] p-6 pt-7">
-              <img class="outsourcing-icon" src="/template/Logo/assets/Talent Profiles/Technical Support & Maintenance.png" alt="Technical Support & Maintenance Icon" />
-              <h2 class="text-2xl font-black text-brand-blue">Technical Support & Maintenance</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Ongoing support, troubleshooting, and maintenance for business-critical systems.</p>
-            </article>
-            <article class="outsourcing-card rounded-[26px] p-6 pt-7">
-              <img class="outsourcing-icon" src="/template/Logo/assets/Talent Profiles/Project-Based IT Team.png" alt="Project-Based IT Team Icon" />
-              <h2 class="text-2xl font-black text-brand-blue">Project-Based IT Teams</h2>
-              <p class=" leading-7 mt-4 text-slate-600">Cross-functional teams for specific delivery objectives, scope, and timeline.</p>
-            </article>
+            @forelse ($talentProfileItems as $item)
+              <article class="outsourcing-card rounded-[26px] p-6 pt-7">
+                <h2 class="text-2xl font-black text-brand-blue">{{ $item->title }}</h2>
+                <div class="leading-7 mt-4 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $item->description !!}</div>
+              </article>
+            @empty
+              <article class="outsourcing-card rounded-[26px] p-6 pt-7">
+                <h2 class="text-2xl font-black text-brand-blue">Dedicated IT Staff</h2>
+                <p class="leading-7 mt-4 text-slate-600">Programmers, Network Engineers, Data Analysts, and other deployment-ready professionals.</p>
+              </article>
+            @endforelse
           </div>
         </div>
       </section>
@@ -109,30 +104,20 @@
               <h2 class="mt-4 text-3xl font-black text-brand-blue">Lower hiring risk with structured validation and deployment-ready talent.</h2>
             </div>
             <div class="grid gap-4 sm:grid-cols-2">
-              <div class="benefit-card rounded-[24px] p-5 pt-7">
-                <div class="benefit-item">
-                  <img class="benefit-check" src="/template/Logo/assets/check.png" alt="Check icon" />
-                  <p>Pre-qualified talent with verified experience and certifications.</p>
+              @forelse ($benefitCardItems as $item)
+                <div class="benefit-card rounded-[24px] p-5 pt-7">
+                  <div class="benefit-item">
+                    <p class="font-bold text-brand-blue">{{ $item->title }}</p>
+                    <div class="mt-2 text-slate-700 [&_p]:mb-2 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $item->description !!}</div>
+                  </div>
                 </div>
-              </div>
-              <div class="benefit-card rounded-[24px] p-5 pt-7">
-                <div class="benefit-item">
-                  <img class="benefit-check" src="/template/Logo/assets/check.png" alt="Check icon" />
-                  <p>Faster onboarding with deployment-ready professionals.</p>
+              @empty
+                <div class="benefit-card rounded-[24px] p-5 pt-7">
+                  <div class="benefit-item">
+                    <p>Pre-qualified talent with verified experience and certifications.</p>
+                  </div>
                 </div>
-              </div>
-              <div class="benefit-card rounded-[24px] p-5 pt-7">
-                <div class="benefit-item">
-                  <img class="benefit-check" src="/template/Logo/assets/check.png" alt="Check icon" />
-                  <p>Lower hiring risk through structured screening and validation.</p>
-                </div>
-              </div>
-              <div class="benefit-card rounded-[24px] p-5 pt-7">
-                <div class="benefit-item">
-                  <img class="benefit-check" src="/template/Logo/assets/check.png" alt="Check icon" />
-                  <p>Immediate productivity from teams prepared for real-world environments.</p>
-                </div>
-              </div>
+              @endforelse
             </div>
           </div>
         </div>

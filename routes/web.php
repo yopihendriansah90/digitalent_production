@@ -1,12 +1,17 @@
 <?php
 
+use App\Http\Controllers\Frontend\CompanyProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'pages.home')->name('home');
-Route::view('/about', 'pages.about')->name('about');
-Route::view('/services', 'pages.services')->name('services');
-Route::view('/vision-mission', 'pages.vision-mission')->name('vision-mission');
-Route::view('/portfolio', 'pages.portfolio')->name('portfolio');
-Route::view('/training', 'pages.training')->name('training');
-Route::view('/outsourcing', 'pages.outsourcing')->name('outsourcing');
-Route::view('/contact', 'pages.contact')->name('contact');
+Route::get('/', [CompanyProfileController::class, 'home'])->name('home');
+Route::get('/about', [CompanyProfileController::class, 'about'])->name('about');
+Route::get('/services', [CompanyProfileController::class, 'services'])->name('services');
+Route::get('/contact', [CompanyProfileController::class, 'contact'])->name('contact');
+Route::post('/contact', [CompanyProfileController::class, 'submitContact'])
+    ->middleware('throttle:5,1')
+    ->name('contact.submit');
+
+Route::get('/vision-mission', [CompanyProfileController::class, 'visionMission'])->name('vision-mission');
+Route::get('/portfolio', [CompanyProfileController::class, 'portfolio'])->name('portfolio');
+Route::get('/training', [CompanyProfileController::class, 'training'])->name('training');
+Route::get('/outsourcing', [CompanyProfileController::class, 'outsourcing'])->name('outsourcing');
