@@ -1,6 +1,18 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+  $snapshotItems = ($sections['snapshot']->items ?? collect())->keyBy(fn ($item) => strtolower((string) $item->badge));
+  $snapshotFounded = $snapshotItems->get('founded');
+  $snapshotGroup = $snapshotItems->get('group');
+  $snapshotFocusOne = $snapshotItems->get('focus_1');
+  $snapshotFocusTwo = $snapshotItems->get('focus_2');
+  $whoWeAreTitle = $sections['who_we_are']->section_title ?? 'Who We Are';
+  $whereWeComeFromTitle = $sections['where_we_come_from']->section_title ?? 'Where We Come From';
+  $commitmentTitle = $sections['commitment']->section_title ?? 'Our Commitment';
+  $snapshotSectionTitle = $sections['snapshot']->section_title ?? 'Business Focus';
+  $aboutPhotoUrl = $page?->getFirstMediaUrl('about_photo', 'web') ?: asset('template/Logo/about.jpeg');
+@endphp
 <style>
 
       html { scroll-behavior: smooth; }
@@ -86,45 +98,45 @@
         <div class="mx-auto grid max-w-7xl gap-8 px-4 lg:grid-cols-[1fr_0.96fr] lg:items-start lg:gap-12">
           <div class="space-y-6">
             <article class="panel-card rounded-[28px] p-7 pt-8 sm:p-8 sm:pt-9">
-              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Who We Are</p>
+              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $whoWeAreTitle }}</p>
               <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $sections['who_we_are']->section_description ?? 'PT. Systech Talenta Digital (DigiTalent) is a technology company and strategic partner for digital transformation. We focus on two core services: IT Training and IT Outsourcing. We believe digital progress depends on skilled people who can adapt and perform in real environments.' !!}</div>
             </article>
 
             <article class="panel-card rounded-[28px] p-7 pt-8 sm:p-8 sm:pt-9">
-              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Where We Come From</p>
+              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $whereWeComeFromTitle }}</p>
               <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $sections['where_we_come_from']->section_description ?? 'DigiTalent is part of SGI Asia Group, an IT group established in 2013. We originated from the training division of PT. Systech Global Informasi and later became an independent company. With strong industry experience and networks, we address two key needs: developing competent professionals and providing industry-ready talent. Our goal is to connect industry demands with available skills through structured training and reliable outsourcing services.' !!}</div>
             </article>
 
             <article class="panel-card rounded-[28px] p-7 pt-8 sm:p-8 sm:pt-9">
-              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Our Commitment</p>
+              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $commitmentTitle }}</p>
               <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $sections['commitment']->section_description ?? 'Our commitment is to bridge the gap between industry demands and talent availability. Through structured training programs and flexible, trusted outsourcing services, we empower individuals and organizations to excel in a competitive digital future.' !!}</div>
             </article>
           </div>
 
           <aside class="space-y-5">
-            <div class="story-photo min-h-[320px] rounded-[30px] shadow-soft sm:min-h-[380px] lg:min-h-[460px]" style="--photo: url('/template/Logo/about.jpeg')"></div>
+            <div class="story-photo min-h-[320px] rounded-[30px] shadow-soft sm:min-h-[380px] lg:min-h-[460px]" style="--photo: url('{{ $aboutPhotoUrl }}')"></div>
 
             <div class="grid gap-4 sm:grid-cols-2">
               <div class="rounded-[24px] border border-brand-blue/15 bg-brand-sky/90 p-5">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Founded</p>
-                <p class="mt-2 text-2xl font-black text-brand-navy">Aug 2025</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $snapshotFounded?->title ?? 'Founded' }}</p>
+                <p class="mt-2 text-2xl font-black text-brand-navy">{{ $snapshotFounded?->description ?? 'Aug 2025' }}</p>
               </div>
               <div class="rounded-[24px] border border-brand-blue/15 bg-white/95 p-5">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Group</p>
-                <p class="mt-2 text-2xl font-black text-brand-navy">SGI Asia</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $snapshotGroup?->title ?? 'Group' }}</p>
+                <p class="mt-2 text-2xl font-black text-brand-navy">{{ $snapshotGroup?->description ?? 'SGI Asia' }}</p>
               </div>
             </div>
 
             <div class="panel-card rounded-[28px] p-6 pt-8">
-              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Business Focus</p>
+              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $snapshotSectionTitle }}</p>
               <div class="mt-5 grid gap-3">
                 <div class="rounded-2xl border border-brand-blue/15 bg-white/90 px-4 py-4">
-                  <p class="text-lg font-bold text-brand-navy">IT Training</p>
-                  <p class="mt-1 leading-7 text-slate-600">Structured learning, mentoring, certification preparation, and applied capability development.</p>
+                  <p class="text-lg font-bold text-brand-navy">{{ $snapshotFocusOne?->title ?? 'IT Training' }}</p>
+                  <p class="mt-1 leading-7 text-slate-600">{{ $snapshotFocusOne?->description ?? 'Structured learning, mentoring, certification preparation, and applied capability development.' }}</p>
                 </div>
                 <div class="rounded-2xl border border-brand-blue/15 bg-white/90 px-4 py-4">
-                  <p class="text-lg font-bold text-brand-navy">IT Outsourcing</p>
-                  <p class="mt-1 leading-7 text-slate-600">Trusted IT talent supply for project, operational, and long-term business needs.</p>
+                  <p class="text-lg font-bold text-brand-navy">{{ $snapshotFocusTwo?->title ?? 'IT Outsourcing' }}</p>
+                  <p class="mt-1 leading-7 text-slate-600">{{ $snapshotFocusTwo?->description ?? 'Trusted IT talent supply for project, operational, and long-term business needs.' }}</p>
                 </div>
               </div>
             </div>
@@ -133,5 +145,26 @@
         </div>
       </section>
 
-    
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const revealElements = document.querySelectorAll('.reveal');
+          const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+          if (!reduceMotion && 'IntersectionObserver' in window) {
+            const revealObserver = new IntersectionObserver((entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-visible');
+                revealObserver.unobserve(entry.target);
+              });
+            }, { threshold: 0.16 });
+
+            revealElements.forEach((element) => revealObserver.observe(element));
+            return;
+          }
+
+          revealElements.forEach((element) => element.classList.add('is-visible'));
+        });
+      </script>
+
 @endsection

@@ -33,8 +33,8 @@
         }
       }
       .reveal {
-        opacity: 0;
-        transform: translateY(24px);
+        opacity: 1;
+        transform: translateY(0);
         transition: opacity 760ms cubic-bezier(0.22, 1, 0.36, 1), transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
       }
       .reveal.is-visible {
@@ -42,8 +42,8 @@
         transform: translateY(0);
       }
       .stagger-group .stagger-item {
-        opacity: 0;
-        transform: translateY(24px);
+        opacity: 1;
+        transform: translateY(0);
         transition: opacity 720ms cubic-bezier(0.22, 1, 0.36, 1), transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
       }
       .stagger-group.is-visible .stagger-item {

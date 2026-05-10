@@ -109,8 +109,8 @@ class CmsContentSeeder extends Seeder
                 SectionBlock::query()->updateOrCreate(
                     ['page_id' => $page->id, 'section_key' => $key],
                     [
-                        'section_title' => str($key)->replace('_', ' ')->title()->toString(),
-                        'section_description' => 'Demo content section for ' . str($key)->replace('_', ' ')->lower(),
+                        'section_title' => $this->defaultSectionTitle($key),
+                        'section_description' => $this->defaultSectionDescription($slug, $key),
                         'order_index' => $index,
                         'is_active' => true,
                     ]
@@ -148,6 +148,12 @@ class CmsContentSeeder extends Seeder
     private function sectionItemTemplates(): array
     {
         return [
+            'snapshot' => [
+                ['title' => 'Founded', 'description' => 'Aug 2025', 'badge' => 'founded'],
+                ['title' => 'Group', 'description' => 'SGI Asia', 'badge' => 'group'],
+                ['title' => 'IT Training', 'description' => 'Structured learning, mentoring, certification preparation, and applied capability development.', 'badge' => 'focus_1'],
+                ['title' => 'IT Outsourcing', 'description' => 'Trusted IT talent supply for project, operational, and long-term business needs.', 'badge' => 'focus_2'],
+            ],
             'core_values' => [
                 ['title' => 'Integrity', 'description' => 'Upholding honesty, responsibility, and professional ethics.'],
                 ['title' => 'Adaptive', 'description' => 'Continuously adapting to the latest technological advancements.'],
@@ -228,6 +234,32 @@ class CmsContentSeeder extends Seeder
         ];
     }
 
+    private function defaultSectionTitle(string $sectionKey): string
+    {
+        return match ($sectionKey) {
+            'who_we_are' => 'Who We Are',
+            'where_we_come_from' => 'Where We Come From',
+            'commitment' => 'Our Commitment',
+            'snapshot' => 'Company Snapshot',
+            default => str($sectionKey)->replace('_', ' ')->title()->toString(),
+        };
+    }
+
+    private function defaultSectionDescription(string $slug, string $sectionKey): ?string
+    {
+        if ($slug !== 'about') {
+            return 'Demo content section for ' . str($sectionKey)->replace('_', ' ')->lower();
+        }
+
+        return match ($sectionKey) {
+            'who_we_are' => 'PT. Systech Talenta Digital (DigiTalent) is a technology company and strategic partner for digital transformation. We focus on two core services: IT Training and IT Outsourcing. We believe digital progress depends on skilled people who can adapt and perform in real environments.',
+            'where_we_come_from' => 'DigiTalent is part of SGI Asia Group, an IT group established in 2013. We originated from the training division of PT. Systech Global Informasi and later became an independent company. With strong industry experience and networks, we address two key needs: developing competent professionals and providing industry-ready talent. Our goal is to connect industry demands with available skills through structured training and reliable outsourcing services.',
+            'commitment' => 'Our commitment is to bridge the gap between industry demands and talent availability. Through structured training programs and flexible, trusted outsourcing services, we empower individuals and organizations to excel in a competitive digital future.',
+            'snapshot' => null,
+            default => 'Demo content section for ' . str($sectionKey)->replace('_', ' ')->lower(),
+        };
+    }
+
     private function seedSiteSettingMedia(SiteSetting $siteSetting): void
     {
         $logoLight = base_path('template/Logo/PNG/Horizontal_Background Terang.png');
@@ -247,6 +279,9 @@ class CmsContentSeeder extends Seeder
         };
 
         $this->attachSingleMedia($page, 'hero_background', $heroImage);
+        if ($slug === 'about') {
+            $this->attachSingleMedia($page, 'about_photo', $heroImage);
+        }
         $this->attachMultiMediaIfMissing($page, 'hero_images', $heroImage);
     }
 

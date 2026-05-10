@@ -83,10 +83,6 @@ class PageResource extends Resource
                 $sectionSchema = [
                     Forms\Components\TextInput::make('hero_title')
                         ->maxLength(255),
-                    Forms\Components\SpatieMediaLibraryFileUpload::make('hero_background')
-                        ->collection('hero_background')
-                        ->image()
-                        ->maxSize(4096),
                     Forms\Components\SpatieMediaLibraryFileUpload::make('hero_image_1')
                         ->label('Hero Image 1')
                         ->collection('hero_image_1')
@@ -210,6 +206,255 @@ class PageResource extends Resource
                         ->columns(2)
                         ->collapsed(),
                 ];
+            } elseif ($sectionKey === 'client_logos') {
+                $sectionSchema = [
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
+                        ->label('Section Title')
+                        ->maxLength(255),
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label('Client Logo Items')
+                        ->defaultItems(0)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderableWithButtons()
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\TextInput::make('title')
+                                ->label('Client Name')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\FileUpload::make('extra.image_path')
+                                ->label('Logo Image')
+                                ->disk('public')
+                                ->directory('portfolio/client-logos')
+                                ->image()
+                                ->maxSize(2048),
+                            Forms\Components\RichEditor::make('description')
+                                ->label('Description (Optional)')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline'],
+                                    ['bulletList', 'orderedList', 'link'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(2)
+                        ->collapsed(),
+                ];
+            } elseif ($sectionKey === 'training_gallery') {
+                $sectionSchema = [
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
+                        ->label('Section Title')
+                        ->maxLength(255),
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label('Training Gallery Items')
+                        ->defaultItems(0)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderableWithButtons()
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\TextInput::make('title')
+                                ->label('Card Title')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('badge')
+                                ->label('Year / Badge (Optional)')
+                                ->maxLength(255),
+                            Forms\Components\FileUpload::make('extra.image_path')
+                                ->label('Gallery Image')
+                                ->disk('public')
+                                ->directory('portfolio/training-gallery')
+                                ->image()
+                                ->maxSize(4096),
+                            Forms\Components\RichEditor::make('description')
+                                ->label('Card Description')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline'],
+                                    ['bulletList', 'orderedList', 'link'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(2)
+                        ->collapsed(),
+                ];
+            } elseif ($sectionKey === 'contact_info') {
+                $sectionSchema = [
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
+                        ->label('Section Title')
+                        ->maxLength(255),
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label('Contact Info Items')
+                        ->defaultItems(0)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderableWithButtons()
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\TextInput::make('title')
+                                ->label('Label')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('description')
+                                ->label('Value')
+                                ->maxLength(255),
+                        ])
+                        ->columns(2)
+                        ->collapsed(),
+                ];
+            } elseif ($sectionKey === 'contact_cta') {
+                $sectionSchema = [
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
+                        ->label('Form Title')
+                        ->maxLength(255),
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                ];
+            } elseif ($sectionKey === 'snapshot') {
+                $sectionSchema = [
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
+                        ->label('Section Title')
+                        ->maxLength(255),
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label('Snapshot Items')
+                        ->defaultItems(0)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderableWithButtons()
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\Hidden::make('badge'),
+                            Forms\Components\TextInput::make('title')
+                                ->label('Item Title')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('description')
+                                ->label('Item Description / Value')
+                                ->required()
+                                ->maxLength(255),
+                        ])
+                        ->columns(2)
+                        ->collapsed(),
+                ];
+            } elseif (in_array($sectionKey, ['who_we_are', 'where_we_come_from', 'commitment', 'vision'], true)) {
+                $sectionSchema = [
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
+                        ->label('Section Title')
+                        ->maxLength(255),
+                    Forms\Components\RichEditor::make("section_content.{$sectionKey}.section_description")
+                        ->label('Section Description')
+                        ->toolbarButtons([
+                            ['bold', 'italic', 'underline', 'strike'],
+                            ['h3', 'bulletList', 'orderedList'],
+                            ['blockquote', 'link', 'undo', 'redo'],
+                        ])
+                                ->columnSpanFull(),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('about_photo')
+                        ->label('About Photo')
+                        ->collection('about_photo')
+                        ->image()
+                        ->maxSize(4096)
+                        ->visible(fn (?Page $record): bool => $record?->slug === 'about' && $sectionKey === 'who_we_are'),
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                ];
+            } elseif ($sectionKey === 'mission_list') {
+                $sectionSchema = [
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label('Mission Items')
+                        ->defaultItems(0)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderableWithButtons()
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\RichEditor::make('description')
+                                ->label('Mission Description')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline'],
+                                    ['bulletList', 'orderedList', 'link'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(1)
+                        ->collapsed(),
+                ];
+            } elseif (in_array($sectionKey, ['training_blocks', 'outsourcing_blocks', 'talent_profiles', 'benefit_cards'], true)) {
+                $sectionSchema = [
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label('Section Items')
+                        ->defaultItems(0)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderableWithButtons()
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\TextInput::make('title')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\RichEditor::make('description')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline'],
+                                    ['bulletList', 'orderedList', 'link'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(1)
+                        ->collapsed(),
+                ];
+            } elseif ($sectionKey === 'training_domains') {
+                $sectionSchema = [
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label('Training Domain Items')
+                        ->defaultItems(0)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderableWithButtons()
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\TextInput::make('title')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\RichEditor::make('description')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline'],
+                                    ['bulletList', 'orderedList', 'link'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->columnSpanFull(),
+                            Forms\Components\TextInput::make('badge')
+                                ->label('Badge (Optional)')
+                                ->maxLength(255),
+                        ])
+                        ->columns(1)
+                        ->collapsed(),
+                ];
             } elseif ($sectionKey === 'cta') {
                 $sectionSchema = [
                     Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
@@ -278,13 +523,6 @@ class PageResource extends Resource
                                 ->columnSpanFull(),
                             Forms\Components\TextInput::make('badge')
                                 ->maxLength(255),
-                            Forms\Components\TextInput::make('order_index')
-                                ->numeric()
-                                ->default(0),
-                            Forms\Components\KeyValue::make('extra')
-                                ->keyLabel('Key')
-                                ->valueLabel('Value')
-                                ->addActionLabel('Add metadata'),
                         ])
                         ->columns(2)
                         ->collapsed(),

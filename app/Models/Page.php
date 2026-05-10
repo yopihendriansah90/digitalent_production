@@ -42,6 +42,7 @@ class Page extends Model implements HasMedia
         $this->addMediaCollection('hero_image_1')->singleFile();
         $this->addMediaCollection('hero_image_2')->singleFile();
         $this->addMediaCollection('hero_image_3')->singleFile();
+        $this->addMediaCollection('about_photo')->singleFile();
         $this->addMediaCollection('hero_images');
     }
 

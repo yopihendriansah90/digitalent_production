@@ -37,13 +37,6 @@
         ->values();
     }
 
-    if ($heroSlides->isEmpty()) {
-      $heroBackground = $page->getFirstMediaUrl('hero_background', 'web') ?: $page->getFirstMediaUrl('hero_background');
-
-      if (filled($heroBackground)) {
-        $heroSlides = collect([$heroBackground]);
-      }
-    }
   }
 
   if ($heroSlides->isEmpty()) {

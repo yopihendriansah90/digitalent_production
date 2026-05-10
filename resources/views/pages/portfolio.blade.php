@@ -1,6 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+  $clientLogoItems = $sections['client_logos']->items ?? collect();
+  $trainingGalleryItems = $sections['training_gallery']->items ?? collect();
+@endphp
 <style>
 
       body {
@@ -215,7 +219,25 @@
           </div>
           <div class="mt-8 rounded-[30px] border border-brand-blue/14 bg-transparent p-4 shadow-none sm:p-5 lg:p-6">
             <div id="clients-carousel" class="clients-carousel cursor-grab active:cursor-grabbing">
-              
+              @if ($clientLogoItems->isNotEmpty())
+                <div class="clients-slide">
+                  <div class="clients-grid">
+                    @foreach ($clientLogoItems as $item)
+                      @php
+                        $logoPath = data_get($item->extra, 'image_path');
+                        $logoUrl = filled($logoPath) ? \Illuminate\Support\Facades\Storage::disk('public')->url($logoPath) : null;
+                      @endphp
+                      <article class="logo-card rounded-[22px] border border-brand-blue/14 bg-white p-5">
+                        @if (filled($logoUrl))
+                          <img class="client-logo-img" src="{{ $logoUrl }}" alt="{{ $item->title }} logo" loading="lazy" />
+                        @else
+                          <p class="text-center text-sm font-bold text-brand-blue">{{ $item->title }}</p>
+                        @endif
+                      </article>
+                    @endforeach
+                  </div>
+                </div>
+              @endif
             </div>
             <div id="clients-dots" class="clients-dots mt-6" aria-label="Clients carousel pagination"></div>
           </div>
@@ -225,6 +247,32 @@
       <section class="bg-transparent py-14 lg:py-20">
         <div class="mx-auto max-w-7xl px-4">
           <h2 class="text-3xl font-black text-brand-blue">Per year training documentation showcases</h2>
+          @if ($trainingGalleryItems->isNotEmpty())
+            <div class="gallery-year-block mt-8">
+              <div class="gallery-year-head">
+                <h3 class="text-2xl font-bold text-slate-800">Gallery</h3>
+              </div>
+              <div class="gallery-track mt-4" data-gallery-track>
+                @foreach ($trainingGalleryItems as $item)
+                  @php
+                    $imagePath = data_get($item->extra, 'image_path');
+                    $imageUrl = filled($imagePath) ? \Illuminate\Support\Facades\Storage::disk('public')->url($imagePath) : null;
+                  @endphp
+                  <article class="gallery-card-item">
+                    @if (filled($imageUrl))
+                      <img class="gallery-thumb" src="{{ $imageUrl }}" alt="{{ $item->title }}" loading="lazy" />
+                    @endif
+                    <div class="gallery-meta">
+                      <p class="gallery-meta-title">{{ $item->title }}</p>
+                      @if (filled($item->description))
+                        <div class="gallery-meta-desc [&_p]:mb-2">{!! $item->description !!}</div>
+                      @endif
+                    </div>
+                  </article>
+                @endforeach
+              </div>
+            </div>
+          @else
 
           <div class="gallery-year-block mt-8">
             <div class="gallery-year-head">
@@ -471,6 +519,7 @@
               </article>
             </div>
           </div>
+          @endif
         </div>
       </section>
     

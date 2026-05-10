@@ -1,6 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+  $contactInfoBlock = $sections['contact_info'] ?? null;
+  $contactInfoItems = $contactInfoBlock?->items ?? collect();
+  $contactCtaBlock = $sections['contact_cta'] ?? null;
+@endphp
 <style>
 
       body {
@@ -48,16 +53,24 @@
         <div class="mx-auto grid max-w-7xl gap-8 px-4 lg:grid-cols-[0.9fr_1.1fr]">
           <div class="space-y-5">
             <div class="panel-card rounded-[28px] p-6 pt-8">
-              <h2 class="text-2xl font-black text-brand-blue">Contact Information</h2>
-              <div class="mt-5 space-y-4 leading-7 text-slate-600">
-                <p><strong class="text-brand-navy">Phone:</strong> {{ $siteSetting->phone ?? '(+62) 21 522 4520' }}</p>
-                <p><strong class="text-brand-navy">Email:</strong> {{ $siteSetting->email ?? 'info@digitalent.co.id' }}</p>
-                <p><strong class="text-brand-navy">Website:</strong> {{ $siteSetting->website_url ?? 'www.digitalent.co.id' }}</p>
-                <p><strong class="text-brand-navy">Address:</strong> {{ $siteSetting->address ?? 'Wisma Bumiputera Lantai 1, Jl. Jend. Sudirman Kav. 75 Jakarta Selatan 12910 Indonesia' }}</p>
-                <p><strong class="text-brand-navy">WhatsApp:</strong> <a class="text-brand-blue hover:text-brand-navy" href="{{ $siteSetting?->whatsapp ? 'https://wa.me/'.preg_replace('/\\D+/', '', $siteSetting->whatsapp) : 'https://wa.me/628131337687' }}">{{ $siteSetting->whatsapp ?? '+62 813 1337 687' }}</a></p>
-                <p><strong class="text-brand-navy">Instagram:</strong> <a class="text-brand-blue hover:text-brand-navy" href="{{ $siteSetting->instagram_url ?? 'https://www.instagram.com/digitalent.systech' }}">{{ $siteSetting->instagram_url ?? 'digitalent.systech' }}</a></p>
-                <p><strong class="text-brand-navy">LinkedIn:</strong> <a class="text-brand-blue hover:text-brand-navy" href="{{ $siteSetting->linkedin_url ?? 'https://www.linkedin.com/company/pt-systech-talenta-digital-digitalent' }}">{{ $siteSetting->linkedin_url ?? 'PT Systech Talenta Digital' }}</a></p>
-              </div>
+              <h2 class="text-2xl font-black text-brand-blue">{{ $contactInfoBlock?->section_title ?: 'Contact Information' }}</h2>
+              @if ($contactInfoItems->isNotEmpty())
+                <div class="mt-5 space-y-4 leading-7 text-slate-600">
+                  @foreach ($contactInfoItems as $item)
+                    <p><strong class="text-brand-navy">{{ $item->title }}:</strong> {{ $item->description }}</p>
+                  @endforeach
+                </div>
+              @else
+                <div class="mt-5 space-y-4 leading-7 text-slate-600">
+                  <p><strong class="text-brand-navy">Phone:</strong> {{ $siteSetting->phone ?? '(+62) 21 522 4520' }}</p>
+                  <p><strong class="text-brand-navy">Email:</strong> {{ $siteSetting->email ?? 'info@digitalent.co.id' }}</p>
+                  <p><strong class="text-brand-navy">Website:</strong> {{ $siteSetting->website_url ?? 'www.digitalent.co.id' }}</p>
+                  <p><strong class="text-brand-navy">Address:</strong> {{ $siteSetting->address ?? 'Wisma Bumiputera Lantai 1, Jl. Jend. Sudirman Kav. 75 Jakarta Selatan 12910 Indonesia' }}</p>
+                  <p><strong class="text-brand-navy">WhatsApp:</strong> <a class="text-brand-blue hover:text-brand-navy" href="{{ $siteSetting?->whatsapp ? 'https://wa.me/'.preg_replace('/\\D+/', '', $siteSetting->whatsapp) : 'https://wa.me/628131337687' }}">{{ $siteSetting->whatsapp ?? '+62 813 1337 687' }}</a></p>
+                  <p><strong class="text-brand-navy">Instagram:</strong> <a class="text-brand-blue hover:text-brand-navy" href="{{ $siteSetting->instagram_url ?? 'https://www.instagram.com/digitalent.systech' }}">{{ $siteSetting->instagram_url ?? 'digitalent.systech' }}</a></p>
+                  <p><strong class="text-brand-navy">LinkedIn:</strong> <a class="text-brand-blue hover:text-brand-navy" href="{{ $siteSetting->linkedin_url ?? 'https://www.linkedin.com/company/pt-systech-talenta-digital-digitalent' }}">{{ $siteSetting->linkedin_url ?? 'PT Systech Talenta Digital' }}</a></p>
+                </div>
+              @endif
             </div>
 
           </div>
@@ -65,7 +78,7 @@
           <form class="panel-card rounded-[30px] p-7 pt-8" method="POST" action="{{ route('contact.submit') }}">
             @csrf
             <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
-            <h2 class="text-2xl font-black text-brand-blue">Contact Form</h2>
+            <h2 class="text-2xl font-black text-brand-blue">{{ $contactCtaBlock?->section_title ?: 'Contact Form' }}</h2>
             @if (session('success'))
               <p class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ session('success') }}</p>
             @endif

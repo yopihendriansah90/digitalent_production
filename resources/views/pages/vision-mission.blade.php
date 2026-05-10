@@ -15,8 +15,8 @@
           linear-gradient(180deg, #fafdff 0%, #ffffff 100%);
       }
       .reveal {
-        opacity: 0;
-        transform: translateY(24px);
+        opacity: 1;
+        transform: translateY(0);
         transition: opacity 700ms ease, transform 700ms ease;
       }
       .reveal.is-visible {

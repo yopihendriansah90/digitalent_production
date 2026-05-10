@@ -30,23 +30,28 @@ class EditPage extends EditRecord
 
         foreach (config("company_profile.section_keys.{$page->slug}", []) as $index => $sectionKey) {
             $block = $page->sectionBlocks->firstWhere('section_key', $sectionKey);
+            $items = $block
+                ? $block->items->sortBy('order_index')->values()->map(function (SectionItem $item): array {
+                    return [
+                        'id' => $item->id,
+                        'title' => $item->title,
+                        'description' => $item->description,
+                        'badge' => $item->badge,
+                        'order_index' => $item->order_index,
+                        'extra' => $item->extra,
+                    ];
+                })->all()
+                : [];
+
+            if ($sectionKey === 'snapshot' && count($items) === 0) {
+                $items = $this->defaultSnapshotItems();
+            }
 
             $sectionContent[$sectionKey] = [
                 'section_title' => $block?->section_title ?? $this->defaultSectionTitle($sectionKey),
-                'section_description' => $block?->section_description,
+                'section_description' => $block?->section_description ?? $this->defaultSectionDescription($sectionKey),
                 'is_active' => $block?->is_active ?? true,
-                'items' => $block
-                    ? $block->items->sortBy('order_index')->values()->map(function (SectionItem $item): array {
-                        return [
-                            'id' => $item->id,
-                            'title' => $item->title,
-                            'description' => $item->description,
-                            'badge' => $item->badge,
-                            'order_index' => $item->order_index,
-                            'extra' => $item->extra,
-                        ];
-                    })->all()
-                    : [],
+                'items' => $items,
             ];
         }
 
@@ -93,7 +98,7 @@ class EditPage extends EditRecord
                 ['page_id' => $page->id, 'section_key' => $sectionKey],
                 [
                     'section_title' => $this->defaultSectionTitle($sectionKey),
-                    'section_description' => null,
+                    'section_description' => $this->defaultSectionDescription($sectionKey),
                     'order_index' => $index,
                     'is_active' => true,
                 ]
@@ -107,11 +112,13 @@ class EditPage extends EditRecord
     private function syncSectionItems(SectionBlock $block, array $items): void
     {
         $keptIds = [];
+        $snapshotBadges = ['founded', 'group', 'focus_1', 'focus_2'];
 
         foreach (array_values($items) as $index => $itemData) {
             $title = trim((string) Arr::get($itemData, 'title', ''));
+            $description = trim(strip_tags((string) Arr::get($itemData, 'description', '')));
 
-            if ($title === '') {
+            if ($title === '' && $description === '') {
                 continue;
             }
 
@@ -131,9 +138,11 @@ class EditPage extends EditRecord
             }
 
             $item->fill([
-                'title' => $title,
+                'title' => $title !== '' ? $title : 'Item '.($index + 1),
                 'description' => Arr::get($itemData, 'description'),
-                'badge' => Arr::get($itemData, 'badge'),
+                'badge' => $block->section_key === 'snapshot'
+                    ? (Arr::get($itemData, 'badge') ?: ($snapshotBadges[$index] ?? null))
+                    : Arr::get($itemData, 'badge'),
                 'order_index' => $index,
                 'extra' => Arr::get($itemData, 'extra'),
             ]);
@@ -157,5 +166,29 @@ class EditPage extends EditRecord
             'cta' => 'FAQ',
             default => str($sectionKey)->replace('_', ' ')->title()->toString(),
         };
+    }
+
+    private function defaultSectionDescription(string $sectionKey): ?string
+    {
+        return match ($sectionKey) {
+            'who_we_are' => 'PT. Systech Talenta Digital (DigiTalent) is a technology company and strategic partner for digital transformation. We focus on two core services: IT Training and IT Outsourcing. We believe digital progress depends on skilled people who can adapt and perform in real environments.',
+            'where_we_come_from' => 'DigiTalent is part of SGI Asia Group, an IT group established in 2013. We originated from the training division of PT. Systech Global Informasi and later became an independent company. With strong industry experience and networks, we address two key needs: developing competent professionals and providing industry-ready talent. Our goal is to connect industry demands with available skills through structured training and reliable outsourcing services.',
+            'commitment' => 'Our commitment is to bridge the gap between industry demands and talent availability. Through structured training programs and flexible, trusted outsourcing services, we empower individuals and organizations to excel in a competitive digital future.',
+            'vision' => 'To be the leading strategic partner in developing and providing superior, innovative, and globally competitive digital talent to support international-standard digital transformation',
+            default => null,
+        };
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function defaultSnapshotItems(): array
+    {
+        return [
+            ['badge' => 'founded', 'title' => 'Founded', 'description' => 'Aug 2025'],
+            ['badge' => 'group', 'title' => 'Group', 'description' => 'SGI Asia'],
+            ['badge' => 'focus_1', 'title' => 'IT Training', 'description' => 'Structured learning, mentoring, certification preparation, and applied capability development.'],
+            ['badge' => 'focus_2', 'title' => 'IT Outsourcing', 'description' => 'Trusted IT talent supply for project, operational, and long-term business needs.'],
+        ];
     }
 }
