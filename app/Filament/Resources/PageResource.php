@@ -400,11 +400,26 @@ class PageResource extends Resource
                 ];
             } elseif (in_array($sectionKey, ['training_blocks', 'outsourcing_blocks', 'talent_profiles', 'benefit_cards'], true)) {
                 $sectionSchema = [
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
+                        ->label('Section Title')
+                        ->maxLength(255),
+                    Forms\Components\RichEditor::make("section_content.{$sectionKey}.section_description")
+                        ->label('Section Description')
+                        ->toolbarButtons([
+                            ['bold', 'italic', 'underline'],
+                            ['bulletList', 'orderedList', 'link'],
+                            ['undo', 'redo'],
+                        ])
+                        ->columnSpanFull(),
                     Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
                         ->label('Section Active')
                         ->default(true),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
-                        ->label('Section Items')
+                        ->label(match ($sectionKey) {
+                            'training_blocks' => 'Training Overview Cards',
+                            'outsourcing_blocks' => 'Outsourcing Overview Cards',
+                            default => 'Section Items',
+                        })
                         ->defaultItems(0)
                         ->addable(false)
                         ->deletable(false)

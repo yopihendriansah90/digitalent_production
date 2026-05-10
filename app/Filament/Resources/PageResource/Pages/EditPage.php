@@ -164,6 +164,8 @@ class EditPage extends EditRecord
     {
         return match ($sectionKey) {
             'cta' => 'FAQ',
+            'training_blocks' => 'IT Training',
+            'outsourcing_blocks' => 'IT Outsourcing',
             default => str($sectionKey)->replace('_', ' ')->title()->toString(),
         };
     }
@@ -175,6 +177,8 @@ class EditPage extends EditRecord
             'where_we_come_from' => 'DigiTalent is part of SGI Asia Group, an IT group established in 2013. We originated from the training division of PT. Systech Global Informasi and later became an independent company. With strong industry experience and networks, we address two key needs: developing competent professionals and providing industry-ready talent. Our goal is to connect industry demands with available skills through structured training and reliable outsourcing services.',
             'commitment' => 'Our commitment is to bridge the gap between industry demands and talent availability. Through structured training programs and flexible, trusted outsourcing services, we empower individuals and organizations to excel in a competitive digital future.',
             'vision' => 'To be the leading strategic partner in developing and providing superior, innovative, and globally competitive digital talent to support international-standard digital transformation',
+            'training_blocks' => 'We accommodate a wide range of industry-relevant IT training and certification needs. We ensure that participants gain in-depth understanding and practical expertise through dedicated mentoring in preparation for certification exams.',
+            'outsourcing_blocks' => 'We assist companies in sourcing and managing top-tier IT experts for both short-term and long-term engagements. Through our flexible outsourcing model, we ensure cost efficiency, high-quality performance, and data security.',
             default => null,
         };
     }

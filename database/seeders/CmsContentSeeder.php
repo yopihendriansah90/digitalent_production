@@ -124,7 +124,26 @@ class CmsContentSeeder extends Seeder
 
                 $this->seedSectionBlockMedia($sectionBlock, $slug, $key);
 
-                foreach ($sectionItems[$key] ?? [] as $itemIndex => $item) {
+                $itemsTemplate = $sectionItems[$key] ?? [];
+
+                if (in_array($key, ['training_blocks', 'outsourcing_blocks'], true)) {
+                    $sectionBlock->items()->delete();
+
+                    foreach ($itemsTemplate as $itemIndex => $item) {
+                        SectionItem::query()->create([
+                            'section_block_id' => $sectionBlock->id,
+                            'title' => $item['title'],
+                            'description' => $item['description'],
+                            'badge' => $item['badge'] ?? null,
+                            'order_index' => $itemIndex,
+                            'extra' => $item['extra'] ?? null,
+                        ]);
+                    }
+
+                    continue;
+                }
+
+                foreach ($itemsTemplate as $itemIndex => $item) {
                     SectionItem::query()->updateOrCreate(
                         [
                             'section_block_id' => $sectionBlock->id,
@@ -197,10 +216,12 @@ class CmsContentSeeder extends Seeder
                 ['title' => 'Layanan outsourcing mencakup apa saja?', 'description' => 'Kami menyediakan dedicated IT staff, managed IT services, technical support, maintenance, dan project-based IT teams.'],
             ],
             'training_blocks' => [
-                ['title' => 'Corporate In-house Training', 'description' => 'Program training terstruktur untuk kebutuhan organisasi.'],
+                ['title' => 'Fundamental to Advanced Training', 'description' => 'We offer a specialized Mentored Learning system where professionals can learn with flexible schedules and affordable pricing, without compromising on the quality of the learning experience.'],
+                ['title' => 'Experienced Instructors', 'description' => 'Our learning process is guided by senior practitioners who are not only globally certified but also possess an average of over 5 years of teaching experience.'],
             ],
             'outsourcing_blocks' => [
-                ['title' => 'Dedicated IT Staff', 'description' => 'Talenta IT siap deploy sesuai kebutuhan project.'],
+                ['title' => 'Overview', 'description' => 'We assist companies in sourcing and managing top-tier IT experts for both short-term and long-term engagements.'],
+                ['title' => 'Flexible Outsourcing Model', 'description' => 'Through our flexible outsourcing model, we ensure cost efficiency, high-quality performance, and data security.'],
             ],
             'mission_list' => [
                 ['title' => 'Develop world-class talent', 'description' => 'Membangun talenta digital yang relevan secara global.'],
@@ -241,6 +262,8 @@ class CmsContentSeeder extends Seeder
             'where_we_come_from' => 'Where We Come From',
             'commitment' => 'Our Commitment',
             'snapshot' => 'Company Snapshot',
+            'training_blocks' => 'IT Training',
+            'outsourcing_blocks' => 'IT Outsourcing',
             default => str($sectionKey)->replace('_', ' ')->title()->toString(),
         };
     }
@@ -255,6 +278,8 @@ class CmsContentSeeder extends Seeder
             'who_we_are' => 'PT. Systech Talenta Digital (DigiTalent) is a technology company and strategic partner for digital transformation. We focus on two core services: IT Training and IT Outsourcing. We believe digital progress depends on skilled people who can adapt and perform in real environments.',
             'where_we_come_from' => 'DigiTalent is part of SGI Asia Group, an IT group established in 2013. We originated from the training division of PT. Systech Global Informasi and later became an independent company. With strong industry experience and networks, we address two key needs: developing competent professionals and providing industry-ready talent. Our goal is to connect industry demands with available skills through structured training and reliable outsourcing services.',
             'commitment' => 'Our commitment is to bridge the gap between industry demands and talent availability. Through structured training programs and flexible, trusted outsourcing services, we empower individuals and organizations to excel in a competitive digital future.',
+            'training_blocks' => 'We accommodate a wide range of industry-relevant IT training and certification needs. We ensure that participants gain in-depth understanding and practical expertise through dedicated mentoring in preparation for certification exams.',
+            'outsourcing_blocks' => 'We assist companies in sourcing and managing top-tier IT experts for both short-term and long-term engagements. Through our flexible outsourcing model, we ensure cost efficiency, high-quality performance, and data security.',
             'snapshot' => null,
             default => 'Demo content section for ' . str($sectionKey)->replace('_', ' ')->lower(),
         };

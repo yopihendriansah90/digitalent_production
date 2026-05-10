@@ -2,8 +2,10 @@
 
 @section('content')
 @php
-  $trainingBlockItems = $sections['training_blocks']->items ?? collect();
-  $outsourcingBlockItems = $sections['outsourcing_blocks']->items ?? collect();
+  $trainingBlock = $sections['training_blocks'] ?? null;
+  $outsourcingBlock = $sections['outsourcing_blocks'] ?? null;
+  $trainingBlockItems = $trainingBlock?->items ?? collect();
+  $outsourcingBlockItems = $outsourcingBlock?->items ?? collect();
 @endphp
 <style>
 
@@ -33,8 +35,8 @@
         }
       }
       .reveal {
-        opacity: 1;
-        transform: translateY(0);
+        opacity: 0;
+        transform: translateY(24px);
         transition: opacity 760ms cubic-bezier(0.22, 1, 0.36, 1), transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
       }
       .reveal.is-visible {
@@ -42,8 +44,8 @@
         transform: translateY(0);
       }
       .stagger-group .stagger-item {
-        opacity: 1;
-        transform: translateY(0);
+        opacity: 0;
+        transform: translateY(24px);
         transition: opacity 720ms cubic-bezier(0.22, 1, 0.36, 1), transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
       }
       .stagger-group.is-visible .stagger-item {
@@ -265,12 +267,15 @@
         </div>
       </section>
 
+      @if (($trainingBlock?->is_active ?? true) === true)
       <section class="reveal bg-[linear-gradient(180deg,_rgba(255,255,255,0.94),_rgba(236,248,255,0.5))] py-14 sm:py-16 lg:py-20">
         <div class="mx-auto max-w-7xl px-4">
           <div>
-            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">IT Training</p>
+            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $trainingBlock?->section_title ?: 'IT Training' }}</p>
             <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">Industry-relevant IT training and certification preparation.</h2>
-            <p class="mt-4 max-w-4xl text-lg leading-8 text-slate-600">We accommodate a wide range of industry-relevant IT training and certification needs. We ensure that participants gain in-depth understanding and practical expertise through dedicated mentoring in preparation for certification exams.</p>
+            <div class="mt-4 max-w-4xl text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">
+              {!! $trainingBlock?->section_description ?: 'We accommodate a wide range of industry-relevant IT training and certification needs. We ensure that participants gain in-depth understanding and practical expertise through dedicated mentoring in preparation for certification exams.' !!}
+            </div>
           </div>
 
           <div class="overview-grid stagger-group mt-8">
@@ -353,13 +358,17 @@
           </div>
         </div>
       </section>
+      @endif
 
+      @if (($outsourcingBlock?->is_active ?? true) === true)
       <section class="reveal border-y border-brand-blue/10 bg-[linear-gradient(180deg,_rgba(236,248,255,0.92),_rgba(255,255,255,0.98))] py-14 sm:py-16 lg:py-20">
         <div class="mx-auto max-w-7xl px-4">
           <div>
-            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">IT Outsourcing</p>
+            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $outsourcingBlock?->section_title ?: 'IT Outsourcing' }}</p>
             <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">Top-tier IT experts for short-term and long-term engagements.</h2>
-            <p class="mt-4 max-w-4xl text-lg leading-8 text-slate-600">We assist companies in sourcing and managing top-tier IT experts for both short-term and long-term engagements. Through our flexible outsourcing model, we ensure cost efficiency, high-quality performance, and data security.</p>
+            <div class="mt-4 max-w-4xl text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">
+              {!! $outsourcingBlock?->section_description ?: 'We assist companies in sourcing and managing top-tier IT experts for both short-term and long-term engagements. Through our flexible outsourcing model, we ensure cost efficiency, high-quality performance, and data security.' !!}
+            </div>
           </div>
 
           <div class="overview-grid stagger-group mt-8">
@@ -432,5 +441,28 @@
 
         </div>
       </section>
+      @endif
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const revealElements = document.querySelectorAll('.reveal, .stagger-group, .domain-chart-card');
+          const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+          if (!reduceMotion && 'IntersectionObserver' in window) {
+            const revealObserver = new IntersectionObserver((entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-visible');
+                revealObserver.unobserve(entry.target);
+              });
+            }, { threshold: 0.16 });
+
+            revealElements.forEach((element) => revealObserver.observe(element));
+            return;
+          }
+
+          revealElements.forEach((element) => element.classList.add('is-visible'));
+        });
+      </script>
     
 @endsection
