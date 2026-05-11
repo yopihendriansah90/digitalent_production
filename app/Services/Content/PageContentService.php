@@ -21,7 +21,7 @@ class PageContentService
             ->where('slug', $slug)
             ->with([
                 'sectionBlocks' => fn ($query) => $query
-                    ->where('is_active', true)
+                    ->when($slug !== 'services', fn ($q) => $q->where('is_active', true))
                     ->orderBy('order_index')
                     ->with(['items' => fn ($itemQuery) => $itemQuery->orderBy('order_index')]),
             ])

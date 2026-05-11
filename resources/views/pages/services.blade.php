@@ -2,6 +2,8 @@
 
 @section('content')
 @php
+  use Illuminate\Support\Facades\Storage;
+
   $introCardsBlock = $sections['services_intro_cards'] ?? null;
   $trainingBlock = $sections['training_blocks'] ?? null;
   $trainingDomainBlock = $sections['training_domain'] ?? null;
@@ -23,6 +25,25 @@
 
   $trainingDomainItem = $trainingDomainItems->first();
   $trainingDomainImage = $trainingDomainItem?->extra['image_path'] ?? '/template/Logo/assets/trainging.png';
+  $resolvePublicImage = function (?string $path): string {
+    if (empty($path)) {
+      return '';
+    }
+
+    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+      return $path;
+    }
+
+    if (str_starts_with($path, '/')) {
+      return $path;
+    }
+
+    if (str_starts_with($path, 'template/')) {
+      return asset($path);
+    }
+
+    return Storage::url($path);
+  };
 
   $mentoredCoverItem = $mentoredLearningItems->first();
   $mentoredCoverImage = $mentoredCoverItem?->extra['image_path'] ?? 'https://www.sgi-asia.co.id/Activities/CSAS.jpg';
@@ -333,13 +354,13 @@
           <div class="domain-chart-card reveal mt-8 rounded-[30px] p-5 sm:p-8">
             <div class="domain-chart-layout">
               <div class="max-w-xl">
-                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">{{ $trainingDomainBlock?->section_title ?: 'Domain Training' }}</p>
+                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Domain Training</p>
                 <h3 class="mt-[30px] text-2xl font-black text-brand-blue">{{ $trainingDomainItem?->title ?: 'IT Training Domain' }}</h3>
-                <div class="detail-copy mt-4 text-lg leading-8 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $trainingDomainItem?->description ?: ($trainingDomainBlock?->section_description ?: 'DigiTalent accommodates a broad range of industry-relevant training domains to support both foundational capability building and specialized professional development.') !!}</div>
+                <div class="detail-copy mt-4 text-lg leading-8 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $trainingDomainItem?->description ?: 'DigiTalent accommodates a broad range of industry-relevant training domains to support both foundational capability building and specialized professional development.' !!}</div>
               </div>
               <div class="mt-8 lg:mt-0">
                 <figure class="domain-chart-figure">
-                  <img src="{{ str_starts_with($trainingDomainImage, 'http') ? $trainingDomainImage : asset($trainingDomainImage) }}" alt="Diagram IT Training Domain DigiTalent" loading="lazy" />
+                  <img src="{{ $resolvePublicImage($trainingDomainImage) }}" alt="Diagram IT Training Domain DigiTalent" loading="lazy" />
                 </figure>
               </div>
             </div>

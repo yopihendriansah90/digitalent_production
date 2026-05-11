@@ -107,9 +107,6 @@ class PageResource extends Resource
                     Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
                         ->label('Section Title')
                         ->maxLength(255),
-                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
-                        ->label('Section Active')
-                        ->default(true),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
                         ->label('Core Value Items')
                         ->defaultItems(0)
@@ -147,7 +144,8 @@ class PageResource extends Resource
                         ->maxLength(255),
                     Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
                         ->label('Section Active')
-                        ->default(true),
+                        ->default(true)
+                        ->visible(fn (?Page $record): bool => $record?->slug !== 'services'),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
                         ->label('Progress Counter Items')
                         ->defaultItems(0)
@@ -182,9 +180,6 @@ class PageResource extends Resource
                     Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
                         ->label('Section Title')
                         ->maxLength(255),
-                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
-                        ->label('Section Active')
-                        ->default(true),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
                         ->label('Why Choose Us Items')
                         ->defaultItems(0)
@@ -214,9 +209,6 @@ class PageResource extends Resource
                     Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
                         ->label('Section Title')
                         ->maxLength(255),
-                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
-                        ->label('Section Active')
-                        ->default(true),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
                         ->label('Client Logo Items')
                         ->defaultItems(0)
@@ -252,9 +244,6 @@ class PageResource extends Resource
                     Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
                         ->label('Section Title')
                         ->maxLength(255),
-                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
-                        ->label('Section Active')
-                        ->default(true),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
                         ->label('Training Gallery Items')
                         ->defaultItems(0)
@@ -427,37 +416,22 @@ class PageResource extends Resource
                 ];
             } elseif ($sectionKey === 'training_domain') {
                 $sectionSchema = [
-                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
-                        ->label('Section Title')
-                        ->maxLength(255),
-                    Forms\Components\RichEditor::make("section_content.{$sectionKey}.section_description")
-                        ->label('Section Description')
-                        ->toolbarButtons([
-                            ['bold', 'italic', 'underline'],
-                            ['bulletList', 'orderedList', 'link'],
-                            ['undo', 'redo'],
-                        ])
-                        ->columnSpanFull(),
-                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
-                        ->label('Section Active')
-                        ->default(true),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
-                        ->label(match ($sectionKey) {
-                            'training_domain' => 'Training Domain Content',
-                            'mentored_learning' => 'Mentored Learning Items (item pertama untuk foto utama)',
-                            'training_support_cards' => 'Training Support Cards',
-                            default => 'Selection Process Items',
-                        })
-                        ->defaultItems(0)
+                        ->label('Domain Content')
+                        ->defaultItems(1)
                         ->addable(false)
                         ->deletable(false)
-                        ->reorderableWithButtons()
+                        ->reorderable(false)
+                        ->minItems(1)
+                        ->maxItems(1)
                         ->schema([
                             Forms\Components\Hidden::make('id'),
                             Forms\Components\TextInput::make('title')
+                                ->label('Domain Title')
                                 ->required()
                                 ->maxLength(255),
                             Forms\Components\RichEditor::make('description')
+                                ->label('Domain Description')
                                 ->toolbarButtons([
                                     ['bold', 'italic', 'underline'],
                                     ['bulletList', 'orderedList', 'link'],
@@ -465,14 +439,14 @@ class PageResource extends Resource
                                 ])
                                 ->columnSpanFull(),
                             Forms\Components\FileUpload::make('extra.image_path')
-                                ->label('Image/Icon (Optional)')
+                                ->label('Domain Image')
                                 ->disk('public')
                                 ->directory('services')
                                 ->image()
-                                ->maxSize(4096),
+                                ->maxSize(4096)
+                                ->required(),
                         ])
-                        ->columns(1)
-                        ->collapsed(),
+                        ->columns(1),
                 ];
             } elseif ($sectionKey === 'mentored_learning') {
                 $sectionSchema = [

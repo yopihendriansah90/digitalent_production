@@ -49,6 +49,9 @@ class EditPage extends EditRecord
             if ($sectionKey === 'services_intro_cards' && count($items) === 0) {
                 $items = $this->defaultServicesIntroCardItems();
             }
+            if ($sectionKey === 'training_domain' && count($items) === 0) {
+                $items = $this->defaultTrainingDomainItems();
+            }
 
             $sectionContent[$sectionKey] = [
                 'section_title' => $block?->section_title ?? $this->defaultSectionTitle($sectionKey),
@@ -88,7 +91,9 @@ class EditPage extends EditRecord
                     'section_title' => Arr::get($payload, 'section_title', $this->defaultSectionTitle($sectionKey)),
                     'section_subtitle' => Arr::get($payload, 'section_subtitle', $this->defaultSectionSubtitle($sectionKey)),
                     'section_description' => Arr::get($payload, 'section_description'),
-                    'is_active' => (bool) Arr::get($payload, 'is_active', true),
+                    'is_active' => $page->slug === 'services'
+                        ? true
+                        : (bool) Arr::get($payload, 'is_active', true),
                     'order_index' => $index,
                 ]
             );
@@ -233,6 +238,22 @@ class EditPage extends EditRecord
             [
                 'title' => 'Delivery Standard',
                 'description' => 'Quality, efficiency, high performance, and data security.',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function defaultTrainingDomainItems(): array
+    {
+        return [
+            [
+                'title' => 'IT Training Domain',
+                'description' => 'DigiTalent accommodates a broad range of industry-relevant training domains to support both foundational capability building and specialized professional development.',
+                'extra' => [
+                    'image_path' => 'template/Logo/assets/trainging.png',
+                ],
             ],
         ];
     }
