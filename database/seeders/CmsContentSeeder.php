@@ -110,6 +110,7 @@ class CmsContentSeeder extends Seeder
                     ['page_id' => $page->id, 'section_key' => $key],
                     [
                         'section_title' => $this->defaultSectionTitle($key),
+                        'section_subtitle' => $this->defaultSectionSubtitle($key),
                         'section_description' => $this->defaultSectionDescription($slug, $key),
                         'order_index' => $index,
                         'is_active' => true,
@@ -126,7 +127,7 @@ class CmsContentSeeder extends Seeder
 
                 $itemsTemplate = $sectionItems[$key] ?? [];
 
-                if (in_array($key, ['training_blocks', 'outsourcing_blocks'], true)) {
+                if (in_array($key, ['training_blocks', 'outsourcing_blocks', 'services_intro_cards', 'training_domain', 'mentored_learning', 'training_support_cards', 'services_talent_profiles', 'selection_process'], true)) {
                     $sectionBlock->items()->delete();
 
                     foreach ($itemsTemplate as $itemIndex => $item) {
@@ -223,6 +224,37 @@ class CmsContentSeeder extends Seeder
                 ['title' => 'Overview', 'description' => 'We assist companies in sourcing and managing top-tier IT experts for both short-term and long-term engagements.'],
                 ['title' => 'Flexible Outsourcing Model', 'description' => 'Through our flexible outsourcing model, we ensure cost efficiency, high-quality performance, and data security.'],
             ],
+            'services_intro_cards' => [
+                ['title' => 'Core Services', 'description' => 'Capability development and deployment-ready IT talent.'],
+                ['title' => 'Delivery Standard', 'description' => 'Quality, efficiency, high performance, and data security.'],
+            ],
+            'training_domain' => [
+                ['title' => 'IT Training Domain', 'description' => 'DigiTalent accommodates a broad range of industry-relevant training domains to support both foundational capability building and specialized professional development.', 'extra' => ['image_path' => 'template/Logo/assets/trainging.png']],
+            ],
+            'mentored_learning' => [
+                ['title' => 'Main Photo', 'description' => 'Main illustration for mentored learning section.', 'extra' => ['image_path' => 'https://www.sgi-asia.co.id/Activities/CSAS.jpg']],
+                ['title' => 'Direct Online Access', 'description' => 'Interactive discussions with Trainers.', 'extra' => ['image_path' => 'template/Logo/assets/Mentored Learning/Direct Online Access.png']],
+                ['title' => 'Active Learning', 'description' => 'Supported by virtual technology.', 'extra' => ['image_path' => 'template/Logo/assets/Mentored Learning/Active Learning.png']],
+                ['title' => 'Hands-on Labs', 'description' => 'Practical training environments.', 'extra' => ['image_path' => 'template/Logo/assets/Mentored Learning/Hands-on Labs.png']],
+                ['title' => 'Project-Based Assessments', 'description' => 'Evaluation through real-work projects.', 'extra' => ['image_path' => 'template/Logo/assets/Mentored Learning/Project-Based Assessment.png']],
+                ['title' => 'Real-World Scenarios', 'description' => 'Equipped with case studies and industry examples.', 'extra' => ['image_path' => 'template/Logo/assets/Mentored Learning/Real-World Scenariost.png']],
+            ],
+            'training_support_cards' => [
+                ['title' => 'Flexible Delivery Methods', 'description' => 'We accommodate your needs through Public Classes (Online or Offline), Hybrid learning, as well as Corporate In-House Training and ODP (Office Development Program) tailored for your team.'],
+                ['title' => 'Learning Outcome Focus', 'description' => 'We ensure that participants gain in-depth understanding and practical expertise through dedicated mentoring in preparation for certification exams.'],
+            ],
+            'services_talent_profiles' => [
+                ['title' => 'Dedicated IT Staff', 'description' => 'Programmers, Network Engineers, and Data Analysts ready for direct business deployment.', 'extra' => ['image_path' => 'template/Logo/assets/Talent Profiles/Dedicated IT Staff.png']],
+                ['title' => 'Managed IT Services', 'description' => 'Managed operational support for stable and flexible IT service execution.', 'extra' => ['image_path' => 'template/Logo/assets/Talent Profiles/Managed IT Services.png']],
+                ['title' => 'Technical Support & Maintenance', 'description' => 'Technical support and maintenance to sustain reliable day-to-day operations.', 'extra' => ['image_path' => 'template/Logo/assets/Talent Profiles/Technical Support & Maintenance.png']],
+                ['title' => 'Project-Based IT Teams', 'description' => 'Focused IT teams aligned to defined scope, delivery target, and project timeline.', 'extra' => ['image_path' => 'template/Logo/assets/Talent Profiles/Project-Based IT Team.png']],
+            ],
+            'selection_process' => [
+                ['title' => 'Pre-qualified Talent', 'description' => 'Pre-qualified talent with verified experience and certifications.'],
+                ['title' => 'Faster Onboarding', 'description' => 'Faster onboarding with deployment-ready professionals.'],
+                ['title' => 'Lower Hiring Risk', 'description' => 'Lower hiring risk through structured screening and validation.'],
+                ['title' => 'Immediate Productivity', 'description' => 'Immediate productivity from teams prepared for real-world environments.'],
+            ],
             'mission_list' => [
                 ['title' => 'Develop world-class talent', 'description' => 'Membangun talenta digital yang relevan secara global.'],
                 ['title' => 'Build strategic partnerships', 'description' => 'Kolaborasi aktif dengan industri dan institusi.'],
@@ -264,6 +296,10 @@ class CmsContentSeeder extends Seeder
             'snapshot' => 'Company Snapshot',
             'training_blocks' => 'IT Training',
             'outsourcing_blocks' => 'IT Outsourcing',
+            'training_domain' => 'Domain Training',
+            'mentored_learning' => 'Mentored Learning',
+            'services_talent_profiles' => 'Talent Profiles',
+            'selection_process' => 'Professional Selection Process',
             default => str($sectionKey)->replace('_', ' ')->title()->toString(),
         };
     }
@@ -280,8 +316,22 @@ class CmsContentSeeder extends Seeder
             'commitment' => 'Our commitment is to bridge the gap between industry demands and talent availability. Through structured training programs and flexible, trusted outsourcing services, we empower individuals and organizations to excel in a competitive digital future.',
             'training_blocks' => 'We accommodate a wide range of industry-relevant IT training and certification needs. We ensure that participants gain in-depth understanding and practical expertise through dedicated mentoring in preparation for certification exams.',
             'outsourcing_blocks' => 'We assist companies in sourcing and managing top-tier IT experts for both short-term and long-term engagements. Through our flexible outsourcing model, we ensure cost efficiency, high-quality performance, and data security.',
+            'training_domain' => 'DigiTalent accommodates a broad range of industry-relevant training domains to support both foundational capability building and specialized professional development.',
+            'mentored_learning' => 'A structured learning model for practical capability development.',
+            'services_talent_profiles' => 'Deployment-ready roles for operational and project needs.',
+            'training_support_cards' => null,
+            'selection_process' => 'Structured validation to reduce hiring risk and speed deployment.',
             'snapshot' => null,
             default => 'Demo content section for ' . str($sectionKey)->replace('_', ' ')->lower(),
+        };
+    }
+
+    private function defaultSectionSubtitle(string $sectionKey): ?string
+    {
+        return match ($sectionKey) {
+            'training_blocks' => 'Industry-relevant IT training and certification preparation.',
+            'outsourcing_blocks' => 'Top-tier IT experts for short-term and long-term engagements.',
+            default => null,
         };
     }
 

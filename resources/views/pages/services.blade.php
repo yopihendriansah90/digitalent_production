@@ -2,10 +2,37 @@
 
 @section('content')
 @php
+  $introCardsBlock = $sections['services_intro_cards'] ?? null;
   $trainingBlock = $sections['training_blocks'] ?? null;
+  $trainingDomainBlock = $sections['training_domain'] ?? null;
+  $mentoredLearningBlock = $sections['mentored_learning'] ?? null;
+  $trainingSupportBlock = $sections['training_support_cards'] ?? null;
   $outsourcingBlock = $sections['outsourcing_blocks'] ?? null;
+  $talentProfilesBlock = $sections['services_talent_profiles'] ?? null;
+  $selectionProcessBlock = $sections['selection_process'] ?? null;
+
+  $introCards = $introCardsBlock?->items ?? collect();
   $trainingBlockItems = $trainingBlock?->items ?? collect();
+  $trainingDomainItems = $trainingDomainBlock?->items ?? collect();
+  $mentoredLearningItems = $mentoredLearningBlock?->items ?? collect();
+  $trainingSupportItems = $trainingSupportBlock?->items ?? collect();
   $outsourcingBlockItems = $outsourcingBlock?->items ?? collect();
+  $talentProfileItems = $talentProfilesBlock?->items ?? collect();
+  $selectionProcessItems = $selectionProcessBlock?->items ?? collect();
+  $servicesHeroImage = $page?->getFirstMediaUrl('hero_image_1', 'web') ?: $page?->getFirstMediaUrl('hero_image_1');
+
+  $trainingDomainItem = $trainingDomainItems->first();
+  $trainingDomainImage = $trainingDomainItem?->extra['image_path'] ?? '/template/Logo/assets/trainging.png';
+
+  $mentoredCoverItem = $mentoredLearningItems->first();
+  $mentoredCoverImage = $mentoredCoverItem?->extra['image_path'] ?? 'https://www.sgi-asia.co.id/Activities/CSAS.jpg';
+  $mentoredCards = $mentoredLearningItems->slice(1);
+  $servicesHeroStyle = '';
+
+  if (!empty($servicesHeroImage)) {
+    $safeHeroImage = str_replace(['"', "'"], ['%22', '%27'], $servicesHeroImage);
+    $servicesHeroStyle = "background-image: url('{$safeHeroImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;";
+  }
 @endphp
 <style>
 
@@ -244,16 +271,25 @@
           animation: none !important;
         }
       }
-    
+
 </style>
 
 
-      <section class="hero-entrance overflow-hidden border-b border-sky-100 bg-[linear-gradient(135deg,_rgba(236,248,255,0.96),_rgba(255,255,255,0.98)_42%,_rgba(127,215,255,0.22)_100%)]">
+      <section
+        class="hero-entrance overflow-hidden border-b border-sky-100"
+        style="{{ $servicesHeroStyle }}"
+      >
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-14 lg:py-16">
           <div>
             <p class="text-sm font-medium text-slate-500" data-hero-item="crumb"><a href="{{ route('home') }}" class="hover:text-brand-blue">Home</a> / Services</p>
             <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.04] text-brand-blue sm:text-[2.8rem] lg:text-[3.6rem]" data-hero-item="title">{{ $page?->hero_title ?? 'IT Training and IT Outsourcing' }}</h1>
             <div class="mt-8 grid max-w-3xl gap-4 sm:grid-cols-2">
+              @forelse ($introCards as $card)
+              <div class="rounded-[24px] border border-brand-blue/15 {{ $loop->first ? 'bg-white/92' : 'bg-brand-sky/90' }} px-5 py-5 shadow-soft">
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $card->title }}</p>
+                <p class=" text-lg font-black leading-snug mt-4 text-brand-navy">{{ strip_tags($card->description) }}</p>
+              </div>
+              @empty
               <div class="rounded-[24px] border border-brand-blue/15 bg-white/92 px-5 py-5 shadow-soft">
                 <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Core Services</p>
                 <p class=" text-lg font-black leading-snug mt-4 text-brand-navy">Capability development and deployment-ready IT talent.</p>
@@ -262,6 +298,7 @@
                 <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Delivery Standard</p>
                 <p class=" text-lg font-black leading-snug mt-4 text-brand-navy">Quality, efficiency, high performance, and data security.</p>
               </div>
+              @endforelse
             </div>
           </div>
         </div>
@@ -272,7 +309,7 @@
         <div class="mx-auto max-w-7xl px-4">
           <div>
             <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $trainingBlock?->section_title ?: 'IT Training' }}</p>
-            <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">Industry-relevant IT training and certification preparation.</h2>
+            <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $trainingBlock?->section_subtitle ?: 'Industry-relevant IT training and certification preparation.' }}</h2>
             <div class="mt-4 max-w-4xl text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">
               {!! $trainingBlock?->section_description ?: 'We accommodate a wide range of industry-relevant IT training and certification needs. We ensure that participants gain in-depth understanding and practical expertise through dedicated mentoring in preparation for certification exams.' !!}
             </div>
@@ -292,70 +329,68 @@
             @endforelse
           </div>
 
+          @if (($trainingDomainBlock?->is_active ?? true) === true)
           <div class="domain-chart-card reveal mt-8 rounded-[30px] p-5 sm:p-8">
             <div class="domain-chart-layout">
               <div class="max-w-xl">
-                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Domain Training</p>
-                <h3 class="mt-[30px] text-2xl font-black text-brand-blue">IT Training Domain</h3>
-                <p class="detail-copy mt-4 text-lg leading-8">DigiTalent accommodates a broad range of industry-relevant training domains to support both foundational capability building and specialized professional development.</p>
+                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">{{ $trainingDomainBlock?->section_title ?: 'Domain Training' }}</p>
+                <h3 class="mt-[30px] text-2xl font-black text-brand-blue">{{ $trainingDomainItem?->title ?: 'IT Training Domain' }}</h3>
+                <div class="detail-copy mt-4 text-lg leading-8 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $trainingDomainItem?->description ?: ($trainingDomainBlock?->section_description ?: 'DigiTalent accommodates a broad range of industry-relevant training domains to support both foundational capability building and specialized professional development.') !!}</div>
               </div>
               <div class="mt-8 lg:mt-0">
                 <figure class="domain-chart-figure">
-                  <img src="/template/Logo/assets/trainging.png" alt="Diagram IT Training Domain DigiTalent" loading="lazy" />
+                  <img src="{{ str_starts_with($trainingDomainImage, 'http') ? $trainingDomainImage : asset($trainingDomainImage) }}" alt="Diagram IT Training Domain DigiTalent" loading="lazy" />
                 </figure>
               </div>
             </div>
           </div>
+          @endif
 
+          @if (($mentoredLearningBlock?->is_active ?? true) === true)
           <div class="reveal mt-8 rounded-[30px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft sm:p-8">
             <div class="max-w-3xl">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Mentored Learning</p>
-              <h3 class="mt-[30px] text-2xl font-black text-brand-blue">A structured learning model for practical capability development.</h3>
+              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">{{ $mentoredLearningBlock?->section_title ?: 'Mentored Learning' }}</p>
+              <h3 class="mt-[30px] text-2xl font-black text-brand-blue">{!! $mentoredLearningBlock?->section_description ?: 'A structured learning model for practical capability development.' !!}</h3>
             </div>
             <div class="mt-6 grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
               <div class="rounded-[26px] border border-slate-200 bg-white p-3 shadow-soft">
-                <div class="training-photo min-h-[220px] rounded-[20px] sm:min-h-[320px]" style="--photo: url('https://www.sgi-asia.co.id/Activities/CSAS.jpg')"></div>
+                <div class="training-photo min-h-[220px] rounded-[20px] sm:min-h-[320px]" style="--photo: url('{{ str_starts_with($mentoredCoverImage, 'http') ? $mentoredCoverImage : asset($mentoredCoverImage) }}')"></div>
               </div>
               <div class="mentored-grid">
+                @forelse ($mentoredCards as $item)
+                <div class="mentored-item {{ $loop->last && $loop->count % 2 === 1 ? 'md:col-span-2' : '' }}">
+                  @if (!empty($item->extra['image_path']))
+                  <img class="mentored-icon" src="{{ str_starts_with($item->extra['image_path'], 'http') ? $item->extra['image_path'] : asset($item->extra['image_path']) }}" alt="{{ $item->title }} icon" loading="lazy" />
+                  @endif
+                  <p class="mentored-item-title font-bold">{{ $item->title }}</p>
+                  <p class="mt-2 text-slate-600">{{ strip_tags($item->description) }}</p>
+                </div>
+                @empty
                 <div class="mentored-item">
-                  <img class="mentored-icon" src="/template/Logo/assets/Mentored Learning/Direct Online Access.png" alt="Direct Online Access icon" loading="lazy" />
                   <p class="mentored-item-title font-bold">Direct Online Access</p>
                   <p class="mt-2 text-slate-600">Interactive discussions with Trainers.</p>
                 </div>
-                <div class="mentored-item">
-                  <img class="mentored-icon" src="/template/Logo/assets/Mentored Learning/Active Learning.png" alt="Active Learning icon" loading="lazy" />
-                  <p class="mentored-item-title font-bold">Active Learning</p>
-                  <p class="mt-2 text-slate-600">Supported by virtual technology.</p>
-                </div>
-                <div class="mentored-item">
-                  <img class="mentored-icon" src="/template/Logo/assets/Mentored Learning/Hands-on Labs.png" alt="Hands-on Labs icon" loading="lazy" />
-                  <p class="mentored-item-title font-bold">Hands-on Labs</p>
-                  <p class="mt-2 text-slate-600">Practical training environments.</p>
-                </div>
-                <div class="mentored-item">
-                  <img class="mentored-icon" src="/template/Logo/assets/Mentored Learning/Project-Based Assessment.png" alt="Project-Based Assessments icon" loading="lazy" />
-                  <p class="mentored-item-title font-bold">Project-Based Assessments</p>
-                  <p class="mt-2 text-slate-600">Evaluation through real-work projects.</p>
-                </div>
-                <div class="mentored-item md:col-span-2">
-                  <img class="mentored-icon" src="/template/Logo/assets/Mentored Learning/Real-World Scenariost.png" alt="Real-World Scenarios icon" loading="lazy" />
-                  <p class="mentored-item-title font-bold">Real-World Scenarios</p>
-                  <p class="mt-2 text-slate-600">Equipped with case studies and industry examples.</p>
-                </div>
+                @endforelse
               </div>
             </div>
           </div>
+          @endif
 
+          @if (($trainingSupportBlock?->is_active ?? true) === true)
           <div class="support-grid stagger-group mt-8">
+            @forelse ($trainingSupportItems as $item)
+            <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
+              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">{{ $item->title }}</p>
+              <div class="detail-copy mt-4 text-lg leading-8 text-slate-700 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $item->description !!}</div>
+            </article>
+            @empty
             <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
               <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Flexible Delivery Methods</p>
               <p class="detail-copy mt-4 text-lg leading-8">We accommodate your needs through Public Classes (Online or Offline), Hybrid learning, as well as Corporate In-House Training and ODP (Office Development Program) tailored for your team.</p>
             </article>
-            <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Learning Outcome Focus</p>
-              <p class="detail-copy mt-4 text-lg leading-8">We ensure that participants gain in-depth understanding and practical expertise through dedicated mentoring in preparation for certification exams.</p>
-            </article>
+            @endforelse
           </div>
+          @endif
         </div>
       </section>
       @endif
@@ -365,7 +400,7 @@
         <div class="mx-auto max-w-7xl px-4">
           <div>
             <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $outsourcingBlock?->section_title ?: 'IT Outsourcing' }}</p>
-            <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">Top-tier IT experts for short-term and long-term engagements.</h2>
+            <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $outsourcingBlock?->section_subtitle ?: 'Top-tier IT experts for short-term and long-term engagements.' }}</h2>
             <div class="mt-4 max-w-4xl text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">
               {!! $outsourcingBlock?->section_description ?: 'We assist companies in sourcing and managing top-tier IT experts for both short-term and long-term engagements. Through our flexible outsourcing model, we ensure cost efficiency, high-quality performance, and data security.' !!}
             </div>
@@ -385,59 +420,52 @@
             @endforelse
           </div>
 
+          @if (($talentProfilesBlock?->is_active ?? true) === true)
           <div class="reveal mt-8 rounded-[30px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft sm:p-8">
             <div class="max-w-3xl">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Talent Profiles</p>
-              <h3 class="mt-[30px] text-2xl font-black text-brand-blue">Deployment-ready roles for operational and project needs.</h3>
+              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">{{ $talentProfilesBlock?->section_title ?: 'Talent Profiles' }}</p>
+              <h3 class="mt-[30px] text-2xl font-black text-brand-blue">{!! $talentProfilesBlock?->section_description ?: 'Deployment-ready roles for operational and project needs.' !!}</h3>
             </div>
             <div class="profile-grid mt-6">
+              @forelse ($talentProfileItems as $item)
               <article class="section-card rounded-[24px] p-5">
-                <img class="talent-profile-icon" src="/template/Logo/assets/Talent Profiles/Dedicated IT Staff.png" alt="Dedicated IT Staff icon" />
+                @if (!empty($item->extra['image_path']))
+                <img class="talent-profile-icon" src="{{ str_starts_with($item->extra['image_path'], 'http') ? $item->extra['image_path'] : asset($item->extra['image_path']) }}" alt="{{ $item->title }} icon" />
+                @endif
+                <h4 class="text-xl font-black text-brand-blue">{{ $item->title }}</h4>
+                <p class="detail-copy mt-3 leading-7">{{ strip_tags($item->description) }}</p>
+              </article>
+              @empty
+              <article class="section-card rounded-[24px] p-5">
                 <h4 class="text-xl font-black text-brand-blue">Dedicated IT Staff</h4>
                 <p class="detail-copy mt-3 leading-7">Programmers, Network Engineers, and Data Analysts ready for direct business deployment.</p>
               </article>
-              <article class="section-card rounded-[24px] p-5">
-                <img class="talent-profile-icon" src="/template/Logo/assets/Talent Profiles/Managed IT Services.png" alt="Managed IT Services icon" />
-                <h4 class="text-xl font-black text-brand-blue">Managed IT Services</h4>
-                <p class="detail-copy mt-3 leading-7">Managed operational support for stable and flexible IT service execution.</p>
-              </article>
-              <article class="section-card rounded-[24px] p-5">
-                <img class="talent-profile-icon" src="/template/Logo/assets/Talent Profiles/Technical Support & Maintenance.png" alt="Technical Support & Maintenance icon" />
-                <h4 class="text-xl font-black text-brand-blue">Technical Support & Maintenance</h4>
-                <p class="detail-copy mt-3 leading-7">Technical support and maintenance to sustain reliable day-to-day operations.</p>
-              </article>
-              <article class="section-card rounded-[24px] p-5">
-                <img class="talent-profile-icon" src="/template/Logo/assets/Talent Profiles/Project-Based IT Team.png" alt="Project-Based IT Teams icon" />
-                <h4 class="text-xl font-black text-brand-blue">Project-Based IT Teams</h4>
-                <p class="detail-copy mt-3 leading-7">Focused IT teams aligned to defined scope, delivery target, and project timeline.</p>
-              </article>
+              @endforelse
             </div>
           </div>
+          @endif
 
+          @if (($selectionProcessBlock?->is_active ?? true) === true)
           <div class="reveal mt-8 rounded-[30px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft sm:p-8">
             <div class="max-w-3xl">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Professional Selection Process</p>
-              <h3 class="mt-[30px] text-2xl font-black text-brand-blue">Structured validation to reduce hiring risk and speed deployment.</h3>
+              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">{{ $selectionProcessBlock?->section_title ?: 'Professional Selection Process' }}</p>
+              <h3 class="mt-[30px] text-2xl font-black text-brand-blue">{!! $selectionProcessBlock?->section_description ?: 'Structured validation to reduce hiring risk and speed deployment.' !!}</h3>
             </div>
             <div class="selection-grid mt-6">
+              @forelse ($selectionProcessItems as $item)
+              <div class="mentored-item">
+                <p class="mentored-item-title font-bold">{{ $item->title }}</p>
+                <p class="mt-2 text-slate-600">{{ strip_tags($item->description) }}</p>
+              </div>
+              @empty
               <div class="mentored-item">
                 <p class="mentored-item-title font-bold">Pre-qualified Talent</p>
                 <p class="mt-2 text-slate-600">Pre-qualified talent with verified experience and certifications.</p>
               </div>
-              <div class="mentored-item">
-                <p class="mentored-item-title font-bold">Faster Onboarding</p>
-                <p class="mt-2 text-slate-600">Faster onboarding with deployment-ready professionals.</p>
-              </div>
-              <div class="mentored-item">
-                <p class="mentored-item-title font-bold">Lower Hiring Risk</p>
-                <p class="mt-2 text-slate-600">Lower hiring risk through structured screening and validation.</p>
-              </div>
-              <div class="mentored-item">
-                <p class="mentored-item-title font-bold">Immediate Productivity</p>
-                <p class="mt-2 text-slate-600">Immediate productivity from teams prepared for real-world environments.</p>
-              </div>
+              @endforelse
             </div>
           </div>
+          @endif
 
         </div>
       </section>
@@ -464,5 +492,5 @@
           revealElements.forEach((element) => element.classList.add('is-visible'));
         });
       </script>
-    
+
 @endsection

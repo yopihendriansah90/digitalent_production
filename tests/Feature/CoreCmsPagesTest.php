@@ -60,32 +60,32 @@ class CoreCmsPagesTest extends TestCase
         $response->assertSessionHasErrors(['name', 'email', 'message']);
     }
 
-    public function test_unpublished_page_is_not_used_for_public_render(): void
+    public function test_page_renders_even_when_is_published_false(): void
     {
         Page::query()->create([
             'title' => 'About',
             'slug' => 'about',
-            'hero_title' => 'Hidden Unpublished Hero',
+            'hero_title' => 'Visible Hero Even If Unpublished',
             'is_published' => false,
         ]);
 
         $this->get('/about')
             ->assertOk()
-            ->assertDontSee('Hidden Unpublished Hero');
+            ->assertSee('Visible Hero Even If Unpublished');
     }
 
-    public function test_unpublished_training_page_uses_fallback_content(): void
+    public function test_training_page_renders_even_when_is_published_false(): void
     {
         Page::query()->create([
             'title' => 'Training',
             'slug' => 'training',
-            'hero_title' => 'Hidden Training Hero',
+            'hero_title' => 'Visible Training Hero Even If Unpublished',
             'is_published' => false,
         ]);
 
         $this->get('/training')
             ->assertOk()
-            ->assertDontSee('Hidden Training Hero');
+            ->assertSee('Visible Training Hero Even If Unpublished');
     }
 
     public function test_only_active_sections_are_injected_to_view_data(): void

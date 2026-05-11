@@ -67,8 +67,9 @@ class PageResource extends Resource
                         ->options(self::pageLabels())
                         ->disabled()
                         ->dehydrated(true),
-                    Forms\Components\Toggle::make('is_published')
-                        ->required(),
+                    Forms\Components\Hidden::make('is_published')
+                        ->default(true)
+                        ->dehydrated(true),
                     Forms\Components\TextInput::make('meta_title')
                         ->maxLength(255),
                     Forms\Components\Textarea::make('meta_description')
@@ -84,7 +85,7 @@ class PageResource extends Resource
                     Forms\Components\TextInput::make('hero_title')
                         ->maxLength(255),
                     Forms\Components\SpatieMediaLibraryFileUpload::make('hero_image_1')
-                        ->label('Hero Image 1')
+                        ->label('Hero Image')
                         ->collection('hero_image_1')
                         ->image()
                         ->maxSize(4096),
@@ -92,12 +93,14 @@ class PageResource extends Resource
                         ->label('Hero Image 2')
                         ->collection('hero_image_2')
                         ->image()
-                        ->maxSize(4096),
+                        ->maxSize(4096)
+                        ->visible(fn (?Page $record): bool => $record?->slug !== 'services'),
                     Forms\Components\SpatieMediaLibraryFileUpload::make('hero_image_3')
                         ->label('Hero Image 3')
                         ->collection('hero_image_3')
                         ->image()
-                        ->maxSize(4096),
+                        ->maxSize(4096)
+                        ->visible(fn (?Page $record): bool => $record?->slug !== 'services'),
                 ];
             } elseif ($sectionKey === 'core_values') {
                 $sectionSchema = [
@@ -398,7 +401,31 @@ class PageResource extends Resource
                         ->columns(1)
                         ->collapsed(),
                 ];
-            } elseif (in_array($sectionKey, ['training_blocks', 'outsourcing_blocks', 'talent_profiles', 'benefit_cards'], true)) {
+            } elseif ($sectionKey === 'services_intro_cards') {
+                $sectionSchema = [
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label('Hero Intro Cards')
+                        ->defaultItems(2)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderable(false)
+                        ->minItems(2)
+                        ->maxItems(2)
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\TextInput::make('title')
+                                ->label('Card Label')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('description')
+                                ->label('Card Description')
+                                ->required()
+                                ->maxLength(255),
+                        ])
+                        ->columns(2)
+                        ->collapsed(),
+                ];
+            } elseif ($sectionKey === 'training_domain') {
                 $sectionSchema = [
                     Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
                         ->label('Section Title')
@@ -416,8 +443,144 @@ class PageResource extends Resource
                         ->default(true),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
                         ->label(match ($sectionKey) {
+                            'training_domain' => 'Training Domain Content',
+                            'mentored_learning' => 'Mentored Learning Items (item pertama untuk foto utama)',
+                            'training_support_cards' => 'Training Support Cards',
+                            default => 'Selection Process Items',
+                        })
+                        ->defaultItems(0)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderableWithButtons()
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\TextInput::make('title')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\RichEditor::make('description')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline'],
+                                    ['bulletList', 'orderedList', 'link'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->columnSpanFull(),
+                            Forms\Components\FileUpload::make('extra.image_path')
+                                ->label('Image/Icon (Optional)')
+                                ->disk('public')
+                                ->directory('services')
+                                ->image()
+                                ->maxSize(4096),
+                        ])
+                        ->columns(1)
+                        ->collapsed(),
+                ];
+            } elseif ($sectionKey === 'mentored_learning') {
+                $sectionSchema = [
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
+                        ->label('Section Title')
+                        ->maxLength(255),
+                    Forms\Components\RichEditor::make("section_content.{$sectionKey}.section_description")
+                        ->label('Section Description')
+                        ->toolbarButtons([
+                            ['bold', 'italic', 'underline'],
+                            ['bulletList', 'orderedList', 'link'],
+                            ['undo', 'redo'],
+                        ])
+                        ->columnSpanFull(),
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label('Mentored Learning Items (item pertama untuk foto utama)')
+                        ->defaultItems(0)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderableWithButtons()
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\TextInput::make('title')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\RichEditor::make('description')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline'],
+                                    ['bulletList', 'orderedList', 'link'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->columnSpanFull(),
+                            Forms\Components\FileUpload::make('extra.image_path')
+                                ->label('Image/Icon')
+                                ->disk('public')
+                                ->directory('services')
+                                ->image()
+                                ->maxSize(4096)
+                                ->required(),
+                        ])
+                        ->columns(1)
+                        ->collapsed(),
+                ];
+            } elseif (in_array($sectionKey, ['training_support_cards', 'selection_process'], true)) {
+                $sectionSchema = [
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
+                        ->label('Section Title')
+                        ->maxLength(255),
+                    Forms\Components\RichEditor::make("section_content.{$sectionKey}.section_description")
+                        ->label('Section Description')
+                        ->toolbarButtons([
+                            ['bold', 'italic', 'underline'],
+                            ['bulletList', 'orderedList', 'link'],
+                            ['undo', 'redo'],
+                        ])
+                        ->columnSpanFull(),
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label($sectionKey === 'training_support_cards' ? 'Training Support Cards' : 'Selection Process Items')
+                        ->defaultItems(0)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderableWithButtons()
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\TextInput::make('title')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\RichEditor::make('description')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline'],
+                                    ['bulletList', 'orderedList', 'link'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(1)
+                        ->collapsed(),
+                ];
+            } elseif (in_array($sectionKey, ['training_blocks', 'outsourcing_blocks', 'talent_profiles', 'benefit_cards'], true)) {
+                $sectionSchema = [
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
+                        ->label('Section Title')
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_subtitle")
+                        ->label('Section Subtitle')
+                        ->maxLength(255),
+                    Forms\Components\RichEditor::make("section_content.{$sectionKey}.section_description")
+                        ->label('Section Description')
+                        ->toolbarButtons([
+                            ['bold', 'italic', 'underline'],
+                            ['bulletList', 'orderedList', 'link'],
+                            ['undo', 'redo'],
+                        ])
+                        ->columnSpanFull(),
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label(match ($sectionKey) {
                             'training_blocks' => 'Training Overview Cards',
                             'outsourcing_blocks' => 'Outsourcing Overview Cards',
+                            'talent_profiles', 'services_talent_profiles' => 'Talent Profile Cards',
                             default => 'Section Items',
                         })
                         ->defaultItems(0)
@@ -435,6 +598,52 @@ class PageResource extends Resource
                                     ['bulletList', 'orderedList', 'link'],
                                     ['undo', 'redo'],
                                 ])
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(1)
+                        ->collapsed(),
+                ];
+            } elseif ($sectionKey === 'services_talent_profiles') {
+                $sectionSchema = [
+                    Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
+                        ->label('Section Title')
+                        ->maxLength(255),
+                    Forms\Components\RichEditor::make("section_content.{$sectionKey}.section_description")
+                        ->label('Section Description')
+                        ->toolbarButtons([
+                            ['bold', 'italic', 'underline'],
+                            ['bulletList', 'orderedList', 'link'],
+                            ['undo', 'redo'],
+                        ])
+                        ->columnSpanFull(),
+                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
+                        ->label('Section Active')
+                        ->default(true),
+                    Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
+                        ->label('Talent Profile Cards')
+                        ->defaultItems(0)
+                        ->addable(false)
+                        ->deletable(false)
+                        ->reorderableWithButtons()
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\TextInput::make('title')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\RichEditor::make('description')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline'],
+                                    ['bulletList', 'orderedList', 'link'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->columnSpanFull(),
+                            Forms\Components\FileUpload::make('extra.image_path')
+                                ->label('Image/Icon')
+                                ->disk('public')
+                                ->directory('services')
+                                ->image()
+                                ->maxSize(4096)
+                                ->required()
                                 ->columnSpanFull(),
                         ])
                         ->columns(1)
@@ -584,7 +793,6 @@ class PageResource extends Resource
                     ->label('Page')
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => self::pageLabels()[$state] ?? $state),
-                Tables\Columns\IconColumn::make('is_published')->boolean(),
                 Tables\Columns\TextColumn::make('updated_at')->dateTime()->sortable(),
             ])
             ->actions([

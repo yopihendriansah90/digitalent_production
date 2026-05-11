@@ -19,7 +19,6 @@ class PageContentService
     {
         $page = Page::query()
             ->where('slug', $slug)
-            ->where('is_published', true)
             ->with([
                 'sectionBlocks' => fn ($query) => $query
                     ->where('is_active', true)

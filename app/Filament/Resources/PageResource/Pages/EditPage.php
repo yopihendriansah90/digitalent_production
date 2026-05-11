@@ -46,9 +46,13 @@ class EditPage extends EditRecord
             if ($sectionKey === 'snapshot' && count($items) === 0) {
                 $items = $this->defaultSnapshotItems();
             }
+            if ($sectionKey === 'services_intro_cards' && count($items) === 0) {
+                $items = $this->defaultServicesIntroCardItems();
+            }
 
             $sectionContent[$sectionKey] = [
                 'section_title' => $block?->section_title ?? $this->defaultSectionTitle($sectionKey),
+                'section_subtitle' => $block?->section_subtitle ?? $this->defaultSectionSubtitle($sectionKey),
                 'section_description' => $block?->section_description ?? $this->defaultSectionDescription($sectionKey),
                 'is_active' => $block?->is_active ?? true,
                 'items' => $items,
@@ -63,6 +67,7 @@ class EditPage extends EditRecord
     protected function mutateFormDataBeforeSave(array $data): array
     {
         unset($data['section_content']);
+        $data['is_published'] = true;
 
         return $data;
     }
@@ -81,6 +86,7 @@ class EditPage extends EditRecord
                 ['page_id' => $page->id, 'section_key' => $sectionKey],
                 [
                     'section_title' => Arr::get($payload, 'section_title', $this->defaultSectionTitle($sectionKey)),
+                    'section_subtitle' => Arr::get($payload, 'section_subtitle', $this->defaultSectionSubtitle($sectionKey)),
                     'section_description' => Arr::get($payload, 'section_description'),
                     'is_active' => (bool) Arr::get($payload, 'is_active', true),
                     'order_index' => $index,
@@ -98,6 +104,7 @@ class EditPage extends EditRecord
                 ['page_id' => $page->id, 'section_key' => $sectionKey],
                 [
                     'section_title' => $this->defaultSectionTitle($sectionKey),
+                    'section_subtitle' => $this->defaultSectionSubtitle($sectionKey),
                     'section_description' => $this->defaultSectionDescription($sectionKey),
                     'order_index' => $index,
                     'is_active' => true,
@@ -166,6 +173,10 @@ class EditPage extends EditRecord
             'cta' => 'FAQ',
             'training_blocks' => 'IT Training',
             'outsourcing_blocks' => 'IT Outsourcing',
+            'training_domain' => 'Domain Training',
+            'mentored_learning' => 'Mentored Learning',
+            'services_talent_profiles' => 'Talent Profiles',
+            'selection_process' => 'Professional Selection Process',
             default => str($sectionKey)->replace('_', ' ')->title()->toString(),
         };
     }
@@ -179,6 +190,19 @@ class EditPage extends EditRecord
             'vision' => 'To be the leading strategic partner in developing and providing superior, innovative, and globally competitive digital talent to support international-standard digital transformation',
             'training_blocks' => 'We accommodate a wide range of industry-relevant IT training and certification needs. We ensure that participants gain in-depth understanding and practical expertise through dedicated mentoring in preparation for certification exams.',
             'outsourcing_blocks' => 'We assist companies in sourcing and managing top-tier IT experts for both short-term and long-term engagements. Through our flexible outsourcing model, we ensure cost efficiency, high-quality performance, and data security.',
+            'training_domain' => 'DigiTalent accommodates a broad range of industry-relevant training domains to support both foundational capability building and specialized professional development.',
+            'mentored_learning' => 'A structured learning model for practical capability development.',
+            'services_talent_profiles' => 'Deployment-ready roles for operational and project needs.',
+            'selection_process' => 'Structured validation to reduce hiring risk and speed deployment.',
+            default => null,
+        };
+    }
+
+    private function defaultSectionSubtitle(string $sectionKey): ?string
+    {
+        return match ($sectionKey) {
+            'training_blocks' => 'Industry-relevant IT training and certification preparation.',
+            'outsourcing_blocks' => 'Top-tier IT experts for short-term and long-term engagements.',
             default => null,
         };
     }
@@ -193,6 +217,23 @@ class EditPage extends EditRecord
             ['badge' => 'group', 'title' => 'Group', 'description' => 'SGI Asia'],
             ['badge' => 'focus_1', 'title' => 'IT Training', 'description' => 'Structured learning, mentoring, certification preparation, and applied capability development.'],
             ['badge' => 'focus_2', 'title' => 'IT Outsourcing', 'description' => 'Trusted IT talent supply for project, operational, and long-term business needs.'],
+        ];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function defaultServicesIntroCardItems(): array
+    {
+        return [
+            [
+                'title' => 'Core Services',
+                'description' => 'Capability development and deployment-ready IT talent.',
+            ],
+            [
+                'title' => 'Delivery Standard',
+                'description' => 'Quality, efficiency, high performance, and data security.',
+            ],
         ];
     }
 }

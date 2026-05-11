@@ -18,6 +18,7 @@ class SectionBlock extends Model implements HasMedia
         'page_id',
         'section_key',
         'section_title',
+        'section_subtitle',
         'section_description',
         'order_index',
         'is_active',
