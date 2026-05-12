@@ -70,6 +70,21 @@
         transform: translateY(26px);
         animation: heroRise 760ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
       }
+      .hero-entrance {
+        position: relative;
+        isolation: isolate;
+      }
+      .hero-entrance::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.64));
+      }
+      .hero-entrance > .mx-auto {
+        position: relative;
+        z-index: 1;
+      }
       .hero-entrance [data-hero-item="crumb"] { animation-delay: 100ms; }
       .hero-entrance [data-hero-item="title"] { animation-delay: 200ms; }
       @keyframes heroRise {
@@ -162,6 +177,8 @@
         border: 1px solid rgba(0, 154, 223, 0.14);
         background: rgba(255, 255, 255, 0.96);
         box-shadow: 0 18px 38px rgba(9, 70, 138, 0.08);
+        max-width: 560px;
+        margin-inline: auto;
         opacity: 0;
         transform: translateY(18px) scale(0.985);
         transition:
@@ -181,6 +198,8 @@
       .domain-chart-figure img {
         display: block;
         width: 100%;
+        max-width: 560px;
+        margin-inline: auto;
         height: auto;
         transform: scale(1.01);
         transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -203,6 +222,36 @@
         padding: 14px 16px;
         color: #40526d;
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      }
+      .learning-features-grid {
+        display: grid;
+        gap: 18px;
+      }
+      .learning-feature-card {
+        border-radius: 24px;
+        border: 1px solid rgba(0, 154, 223, 0.14);
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 248, 255, 0.95));
+        padding: 22px 20px;
+        box-shadow: 0 14px 34px rgba(9, 70, 138, 0.08);
+      }
+      .feature-points {
+        margin-top: 12px;
+        display: grid;
+        gap: 10px;
+      }
+      .feature-point {
+        display: grid;
+        grid-template-columns: 10px minmax(0, 1fr);
+        align-items: start;
+        gap: 10px;
+      }
+      .feature-point::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, #009adf, #09468a);
+        margin-top: 7px;
       }
       .mentored-grid {
         display: grid;
@@ -270,6 +319,12 @@
         }
         .mentored-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .learning-features-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .learning-feature-card.is-wide {
+          grid-column: span 2 / span 2;
         }
         .domain-chart-layout {
           grid-template-columns: 0.72fr 1.28fr;
@@ -339,20 +394,6 @@
             </div>
           </div>
 
-          <div class="overview-grid stagger-group mt-8">
-            @forelse ($trainingBlockItems as $item)
-              <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
-                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">{{ $item->title }}</p>
-                <div class="detail-copy mt-4 text-lg leading-8 text-slate-700 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $item->description !!}</div>
-              </article>
-            @empty
-              <article class="section-card stagger-item rounded-[26px] p-6 sm:p-7">
-                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Fundamental to Advanced Training</p>
-                <p class="detail-copy mt-4 text-lg leading-8">We offer a specialized Mentored Learning system where professionals can learn with flexible schedules and affordable pricing.</p>
-              </article>
-            @endforelse
-          </div>
-
           @if (($trainingDomainBlock?->is_active ?? true) === true)
           <div class="domain-chart-card reveal mt-8 rounded-[30px] p-5 sm:p-8">
             <div class="domain-chart-layout">
@@ -367,6 +408,34 @@
                 </figure>
               </div>
             </div>
+          </div>
+
+          <div class="learning-features-grid reveal mt-6">
+            <article class="learning-feature-card is-wide">
+              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em] text-brand-blue">Fundamental to Advanced Training</p>
+              <p class="mt-3 text-lg leading-8 text-slate-700">We offer a specialized Mentored Learning system where professionals can learn with flexible schedules and affordable pricing, without compromising learning quality.</p>
+            </article>
+
+            <article class="learning-feature-card">
+              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em] text-brand-blue">Mentored Learning</p>
+              <div class="feature-points text-[1.05rem] leading-7 text-slate-700">
+                <p class="feature-point">Direct Online Access: Interactive discussions with trainers.</p>
+                <p class="feature-point">Active Learning: Supported by virtual technology.</p>
+                <p class="feature-point">Hands-on Labs: Practical training environments.</p>
+                <p class="feature-point">Project-Based Assessments: Evaluation through real-work projects.</p>
+                <p class="feature-point">Real-World Scenarios: Equipped with case studies and industry examples.</p>
+              </div>
+            </article>
+
+            <article class="learning-feature-card">
+              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em] text-brand-blue">Experienced Instructors</p>
+              <p class="mt-3 text-[1.05rem] leading-8 text-slate-700">Our learning process is guided by senior practitioners who are globally certified and have an average of over 5 years of teaching experience.</p>
+            </article>
+
+            <article class="learning-feature-card is-wide">
+              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em] text-brand-blue">Flexible Delivery Methods</p>
+              <p class="mt-3 text-[1.05rem] leading-8 text-slate-700">We accommodate your needs through Public Classes (Online or Offline), Hybrid learning, Corporate In-House Training, and ODP (Office Development Program) tailored for your team.</p>
+            </article>
           </div>
           @endif
 

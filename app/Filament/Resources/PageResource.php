@@ -399,8 +399,7 @@ class PageResource extends Resource
                                 ->required()
                                 ->maxLength(255),
                         ])
-                        ->columns(2)
-                        ->collapsed(),
+                        ->columns(2),
                 ];
             } elseif ($sectionKey === 'training_domain') {
                 $sectionSchema = [
@@ -601,6 +600,7 @@ class PageResource extends Resource
                                 ->columnSpanFull(),
                         ])
                         ->columns(1)
+                        ->visible(fn (?Page $record): bool => !($record?->slug === 'services' && $sectionKey === 'training_blocks'))
                         ->collapsed(),
                 ];
             } elseif ($sectionKey === 'services_talent_profiles') {
