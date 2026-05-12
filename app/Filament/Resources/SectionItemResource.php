@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SectionItemResource\Pages;
 use App\Models\SectionItem;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Schemas\Schema;
@@ -64,5 +65,12 @@ class SectionItemResource extends Resource
             'create' => Pages\CreateSectionItem::route('/create'),
             'edit' => Pages\EditSectionItem::route('/{record}/edit'),
         ];
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        $record->loadMissing('sectionBlock.page');
+
+        return $record->sectionBlock?->page?->slug !== 'services';
     }
 }

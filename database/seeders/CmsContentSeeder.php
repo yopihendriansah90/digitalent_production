@@ -269,9 +269,6 @@ class CmsContentSeeder extends Seeder
                 ['title' => 'Cybersecurity', 'description' => 'Pelatihan untuk pertahanan keamanan siber organisasi.'],
                 ['title' => 'Project Management', 'description' => 'Program penguatan delivery dan governance proyek IT.'],
             ],
-            'mentored_learning' => [
-                ['title' => 'Hands-on Labs', 'description' => 'Belajar melalui praktik langsung berbasis skenario.'],
-            ],
             'talent_profiles' => [
                 ['title' => 'Managed IT Services', 'description' => 'Tim IT fleksibel untuk dukungan operasional bisnis.'],
             ],

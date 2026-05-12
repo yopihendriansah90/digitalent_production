@@ -52,12 +52,42 @@ class EditPage extends EditRecord
             if ($sectionKey === 'training_domain' && count($items) === 0) {
                 $items = $this->defaultTrainingDomainItems();
             }
+            if ($sectionKey === 'mentored_learning' && count($items) === 0) {
+                $items = $this->defaultMentoredLearningItems();
+            }
+
+            $coverImage = null;
+            if ($sectionKey === 'mentored_learning') {
+                $defaultMentoredItems = $this->defaultMentoredLearningItems();
+                $existingCoverImage = Arr::get($items, '0.extra.image_path');
+                $defaultCoverImage = Arr::get($defaultMentoredItems, '0.extra.image_path');
+                $coverImage = $existingCoverImage ?: $defaultCoverImage;
+
+                $existingCards = array_values(array_slice($items, 1));
+                $defaultCards = array_values(array_slice($defaultMentoredItems, 1));
+                $items = array_slice(array_merge($existingCards, $defaultCards), 0, 5);
+
+                foreach ($items as $cardIndex => &$card) {
+                    $fallbackCard = $defaultCards[$cardIndex] ?? [];
+                    $card['title'] = trim((string) ($card['title'] ?? '')) !== ''
+                        ? $card['title']
+                        : ($fallbackCard['title'] ?? 'Card '.($cardIndex + 1));
+                    $card['description'] = trim((string) ($card['description'] ?? '')) !== ''
+                        ? $card['description']
+                        : ($fallbackCard['description'] ?? '');
+                    $card['extra']['image_path'] = Arr::get($card, 'extra.image_path')
+                        ?: Arr::get($fallbackCard, 'extra.image_path');
+                }
+                unset($card);
+
+            }
 
             $sectionContent[$sectionKey] = [
                 'section_title' => $block?->section_title ?? $this->defaultSectionTitle($sectionKey),
                 'section_subtitle' => $block?->section_subtitle ?? $this->defaultSectionSubtitle($sectionKey),
                 'section_description' => $block?->section_description ?? $this->defaultSectionDescription($sectionKey),
                 'is_active' => $block?->is_active ?? true,
+                'cover_image' => $coverImage,
                 'items' => $items,
             ];
         }
@@ -98,7 +128,21 @@ class EditPage extends EditRecord
                 ]
             );
 
-            $this->syncSectionItems($block, Arr::get($payload, 'items', []));
+            $items = Arr::get($payload, 'items', []);
+
+            if ($sectionKey === 'mentored_learning') {
+                $coverImage = Arr::get($payload, 'cover_image');
+
+                if (! empty($coverImage)) {
+                    array_unshift($items, [
+                        'title' => 'Main Photo',
+                        'description' => 'Main illustration for mentored learning section.',
+                        'extra' => ['image_path' => $coverImage],
+                    ]);
+                }
+            }
+
+            $this->syncSectionItems($block, $items);
         }
     }
 
@@ -253,6 +297,57 @@ class EditPage extends EditRecord
                 'description' => 'DigiTalent accommodates a broad range of industry-relevant training domains to support both foundational capability building and specialized professional development.',
                 'extra' => [
                     'image_path' => 'template/Logo/assets/trainging.png',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function defaultMentoredLearningItems(): array
+    {
+        return [
+            [
+                'title' => 'Main Photo',
+                'description' => 'Main illustration for mentored learning section.',
+                'extra' => [
+                    'image_path' => 'https://www.sgi-asia.co.id/Activities/CSAS.jpg',
+                ],
+            ],
+            [
+                'title' => 'Direct Online Access',
+                'description' => 'Interactive discussions with Trainers.',
+                'extra' => [
+                    'image_path' => 'template/Logo/assets/Mentored Learning/Direct Online Access.png',
+                ],
+            ],
+            [
+                'title' => 'Active Learning',
+                'description' => 'Supported by virtual technology.',
+                'extra' => [
+                    'image_path' => 'template/Logo/assets/Mentored Learning/Active Learning.png',
+                ],
+            ],
+            [
+                'title' => 'Hands-on Labs',
+                'description' => 'Practical training environments.',
+                'extra' => [
+                    'image_path' => 'template/Logo/assets/Mentored Learning/Hands-on Labs.png',
+                ],
+            ],
+            [
+                'title' => 'Project-Based Assessments',
+                'description' => 'Evaluation through real-work projects.',
+                'extra' => [
+                    'image_path' => 'template/Logo/assets/Mentored Learning/Project-Based Assessment.png',
+                ],
+            ],
+            [
+                'title' => 'Real-World Scenarios',
+                'description' => 'Equipped with case studies and industry examples.',
+                'extra' => [
+                    'image_path' => 'template/Logo/assets/Mentored Learning/Real-World Scenariost.png',
                 ],
             ],
         ];

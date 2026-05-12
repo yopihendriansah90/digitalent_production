@@ -282,9 +282,6 @@ class PageResource extends Resource
                     Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
                         ->label('Section Title')
                         ->maxLength(255),
-                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
-                        ->label('Section Active')
-                        ->default(true),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
                         ->label('Contact Info Items')
                         ->defaultItems(0)
@@ -309,18 +306,12 @@ class PageResource extends Resource
                     Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
                         ->label('Form Title')
                         ->maxLength(255),
-                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
-                        ->label('Section Active')
-                        ->default(true),
                 ];
             } elseif ($sectionKey === 'snapshot') {
                 $sectionSchema = [
                     Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
                         ->label('Section Title')
                         ->maxLength(255),
-                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
-                        ->label('Section Active')
-                        ->default(true),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
                         ->label('Snapshot Items')
                         ->defaultItems(0)
@@ -345,10 +336,10 @@ class PageResource extends Resource
             } elseif (in_array($sectionKey, ['who_we_are', 'where_we_come_from', 'commitment', 'vision'], true)) {
                 $sectionSchema = [
                     Forms\Components\TextInput::make("section_content.{$sectionKey}.section_title")
-                        ->label('Section Title')
+                        ->label('Section Label (Kicker)')
                         ->maxLength(255),
                     Forms\Components\RichEditor::make("section_content.{$sectionKey}.section_description")
-                        ->label('Section Description')
+                        ->label('Main Heading')
                         ->toolbarButtons([
                             ['bold', 'italic', 'underline', 'strike'],
                             ['h3', 'bulletList', 'orderedList'],
@@ -361,9 +352,6 @@ class PageResource extends Resource
                         ->image()
                         ->maxSize(4096)
                         ->visible(fn (?Page $record): bool => $record?->slug === 'about' && $sectionKey === 'who_we_are'),
-                    Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
-                        ->label('Section Active')
-                        ->default(true),
                 ];
             } elseif ($sectionKey === 'mission_list') {
                 $sectionSchema = [
@@ -464,18 +452,29 @@ class PageResource extends Resource
                     Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
                         ->label('Section Active')
                         ->default(true),
+                    Forms\Components\FileUpload::make("section_content.{$sectionKey}.cover_image")
+                        ->label('Main Photo')
+                        ->disk('public')
+                        ->directory('services')
+                        ->image()
+                        ->maxSize(4096),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
-                        ->label('Mentored Learning Items (item pertama untuk foto utama)')
-                        ->defaultItems(0)
-                        ->addable(false)
-                        ->deletable(false)
-                        ->reorderableWithButtons()
+                        ->label('Mentored Learning Cards')
+                        ->defaultItems(5)
+                        ->addActionLabel('Add Card')
+                        ->addable(true)
+                        ->deletable(true)
+                        ->minItems(5)
+                        ->maxItems(5)
+                        ->reorderable(false)
                         ->schema([
                             Forms\Components\Hidden::make('id'),
                             Forms\Components\TextInput::make('title')
+                                ->label('Card Title')
                                 ->required()
                                 ->maxLength(255),
                             Forms\Components\RichEditor::make('description')
+                                ->label('Card Description')
                                 ->toolbarButtons([
                                     ['bold', 'italic', 'underline'],
                                     ['bulletList', 'orderedList', 'link'],
@@ -483,12 +482,38 @@ class PageResource extends Resource
                                 ])
                                 ->columnSpanFull(),
                             Forms\Components\FileUpload::make('extra.image_path')
-                                ->label('Image/Icon')
+                                ->label('Card Icon')
                                 ->disk('public')
                                 ->directory('services')
                                 ->image()
                                 ->maxSize(4096)
                                 ->required(),
+                        ])
+                        ->columns(1)
+                        ->collapsed(),
+                    Forms\Components\Repeater::make('section_content.training_support_cards.items')
+                        ->label('Support Cards (Flexible Delivery & Learning Outcome)')
+                        ->defaultItems(2)
+                        ->addActionLabel('Add Card')
+                        ->addable(true)
+                        ->deletable(true)
+                        ->minItems(2)
+                        ->maxItems(2)
+                        ->reorderable(false)
+                        ->schema([
+                            Forms\Components\Hidden::make('id'),
+                            Forms\Components\TextInput::make('title')
+                                ->label('Card Title')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\RichEditor::make('description')
+                                ->label('Card Description')
+                                ->toolbarButtons([
+                                    ['bold', 'italic', 'underline'],
+                                    ['bulletList', 'orderedList', 'link'],
+                                    ['undo', 'redo'],
+                                ])
+                                ->columnSpanFull(),
                         ])
                         ->columns(1)
                         ->collapsed(),
@@ -549,7 +574,8 @@ class PageResource extends Resource
                         ->columnSpanFull(),
                     Forms\Components\Toggle::make("section_content.{$sectionKey}.is_active")
                         ->label('Section Active')
-                        ->default(true),
+                        ->default(true)
+                        ->visible(fn (?Page $record): bool => $record?->slug !== 'services'),
                     Forms\Components\Repeater::make("section_content.{$sectionKey}.items")
                         ->label(match ($sectionKey) {
                             'training_blocks' => 'Training Overview Cards',

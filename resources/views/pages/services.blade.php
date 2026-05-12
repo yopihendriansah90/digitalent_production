@@ -47,7 +47,7 @@
 
   $mentoredCoverItem = $mentoredLearningItems->first();
   $mentoredCoverImage = $mentoredCoverItem?->extra['image_path'] ?? 'https://www.sgi-asia.co.id/Activities/CSAS.jpg';
-  $mentoredCards = $mentoredLearningItems->slice(1);
+  $mentoredCards = $mentoredLearningItems->slice(1)->take(5);
   $servicesHeroStyle = '';
 
   if (!empty($servicesHeroImage)) {
@@ -268,6 +268,9 @@
         .outsourcing-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
+        .mentored-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
         .domain-chart-layout {
           grid-template-columns: 0.72fr 1.28fr;
           align-items: center;
@@ -368,30 +371,53 @@
           @endif
 
           @if (($mentoredLearningBlock?->is_active ?? true) === true)
-          <div class="reveal mt-8 rounded-[30px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft sm:p-8">
+          <div class="reveal mt-8 rounded-[30px] border border-brand-blue/15 bg-[#eef5fb] p-5 shadow-soft sm:p-8">
             <div class="max-w-3xl">
               <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">{{ $mentoredLearningBlock?->section_title ?: 'Mentored Learning' }}</p>
               <h3 class="mt-[30px] text-2xl font-black text-brand-blue">{!! $mentoredLearningBlock?->section_description ?: 'A structured learning model for practical capability development.' !!}</h3>
             </div>
             <div class="mt-6 grid gap-5 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
               <div class="rounded-[26px] border border-slate-200 bg-white p-3 shadow-soft">
-                <div class="training-photo min-h-[220px] rounded-[20px] sm:min-h-[320px]" style="--photo: url('{{ str_starts_with($mentoredCoverImage, 'http') ? $mentoredCoverImage : asset($mentoredCoverImage) }}')"></div>
+                <div class="training-photo min-h-[220px] rounded-[20px] sm:min-h-[320px]" style="--photo: url('{{ $resolvePublicImage($mentoredCoverImage) }}')"></div>
               </div>
               <div class="mentored-grid">
-                @forelse ($mentoredCards as $item)
-                <div class="mentored-item {{ $loop->last && $loop->count % 2 === 1 ? 'md:col-span-2' : '' }}">
+                @if ($mentoredCards->isNotEmpty())
+                @foreach ($mentoredCards as $item)
+                <div class="mentored-item {{ $loop->index === 4 ? 'md:col-span-2' : '' }}">
                   @if (!empty($item->extra['image_path']))
-                  <img class="mentored-icon" src="{{ str_starts_with($item->extra['image_path'], 'http') ? $item->extra['image_path'] : asset($item->extra['image_path']) }}" alt="{{ $item->title }} icon" loading="lazy" />
+                  <img class="mentored-icon" src="{{ $resolvePublicImage($item->extra['image_path']) }}" alt="{{ $item->title }} icon" loading="lazy" />
                   @endif
                   <p class="mentored-item-title font-bold">{{ $item->title }}</p>
                   <p class="mt-2 text-slate-600">{{ strip_tags($item->description) }}</p>
                 </div>
-                @empty
+                @endforeach
+                @else
                 <div class="mentored-item">
+                  <img class="mentored-icon" src="{{ asset('template/assets/Mentored Learning/Direct Online Access.png') }}" alt="Direct Online Access icon" loading="lazy" />
                   <p class="mentored-item-title font-bold">Direct Online Access</p>
                   <p class="mt-2 text-slate-600">Interactive discussions with Trainers.</p>
                 </div>
-                @endforelse
+                <div class="mentored-item">
+                  <img class="mentored-icon" src="{{ asset('template/assets/Mentored Learning/Active Learning.png') }}" alt="Active Learning icon" loading="lazy" />
+                  <p class="mentored-item-title font-bold">Active Learning</p>
+                  <p class="mt-2 text-slate-600">Supported by virtual technology.</p>
+                </div>
+                <div class="mentored-item">
+                  <img class="mentored-icon" src="{{ asset('template/assets/Mentored Learning/Hands-on Labs.png') }}" alt="Hands-on Labs icon" loading="lazy" />
+                  <p class="mentored-item-title font-bold">Hands-on Labs</p>
+                  <p class="mt-2 text-slate-600">Practical training environments.</p>
+                </div>
+                <div class="mentored-item">
+                  <img class="mentored-icon" src="{{ asset('template/assets/Mentored Learning/Project-Based Assessment.png') }}" alt="Project-Based Assessments icon" loading="lazy" />
+                  <p class="mentored-item-title font-bold">Project-Based Assessments</p>
+                  <p class="mt-2 text-slate-600">Evaluation through real-work projects.</p>
+                </div>
+                <div class="mentored-item md:col-span-2">
+                  <img class="mentored-icon" src="{{ asset('template/assets/Mentored Learning/Real-World Scenariost.png') }}" alt="Real-World Scenarios icon" loading="lazy" />
+                  <p class="mentored-item-title font-bold">Real-World Scenarios</p>
+                  <p class="mt-2 text-slate-600">Equipped with case studies and industry examples.</p>
+                </div>
+                @endif
               </div>
             </div>
           </div>
@@ -451,7 +477,7 @@
               @forelse ($talentProfileItems as $item)
               <article class="section-card rounded-[24px] p-5">
                 @if (!empty($item->extra['image_path']))
-                <img class="talent-profile-icon" src="{{ str_starts_with($item->extra['image_path'], 'http') ? $item->extra['image_path'] : asset($item->extra['image_path']) }}" alt="{{ $item->title }} icon" />
+                <img class="talent-profile-icon" src="{{ $resolvePublicImage($item->extra['image_path']) }}" alt="{{ $item->title }} icon" />
                 @endif
                 <h4 class="text-xl font-black text-brand-blue">{{ $item->title }}</h4>
                 <p class="detail-copy mt-3 leading-7">{{ strip_tags($item->description) }}</p>
