@@ -4,6 +4,18 @@
 
 @php
   $homeContent = $homeContent ?? null;
+  $activeLocale = request()->query('lang', app()->getLocale());
+  if (! in_array($activeLocale, ['id', 'en'], true)) {
+    $activeLocale = 'id';
+  }
+
+  $trans = function ($value, ?string $fallback = null) use ($activeLocale) {
+    if (is_array($value)) {
+      return data_get($value, $activeLocale) ?: data_get($value, 'id') ?: data_get($value, 'en') ?: $fallback;
+    }
+
+    return $value ?: $fallback;
+  };
 
   $normalizeUrl = function (?string $url, string $fallback): string {
     if (! filled($url)) {
@@ -20,8 +32,8 @@
   $coreValuesBlock = $sections['core_values'] ?? null;
   $coreValuesItems = collect($homeContent?->core_values_items ?: [])->filter()
     ->map(fn ($item) => (object) [
-      'title' => data_get($item, 'title'),
-      'description' => data_get($item, 'description'),
+      'title' => $trans(data_get($item, 'title')),
+      'description' => $trans(data_get($item, 'description')),
       'extra' => [],
     ]);
   if ($coreValuesItems->isEmpty()) {
@@ -31,8 +43,8 @@
   $progressCounterBlock = $sections['progress_counter'] ?? null;
   $progressCounterItems = collect($homeContent?->progress_items ?: [])->filter()
     ->map(fn ($item) => (object) [
-      'title' => data_get($item, 'value'),
-      'description' => data_get($item, 'label'),
+      'title' => $trans(data_get($item, 'value')),
+      'description' => $trans(data_get($item, 'label')),
       'extra' => [
         'counter' => data_get($item, 'counter'),
         'suffix' => data_get($item, 'suffix', '+'),
@@ -45,8 +57,8 @@
   $whyChooseBlock = $sections['why_choose_us'] ?? null;
   $whyChooseItems = collect($homeContent?->why_choose_items ?: [])->filter()
     ->map(fn ($item) => (object) [
-      'title' => data_get($item, 'title'),
-      'description' => data_get($item, 'description'),
+      'title' => $trans(data_get($item, 'title')),
+      'description' => $trans(data_get($item, 'description')),
     ]);
   if ($whyChooseItems->isEmpty()) {
     $whyChooseItems = $whyChooseBlock?->items ?? collect();
@@ -55,8 +67,8 @@
   $faqBlock = $sections['cta'] ?? null;
   $faqItems = collect($homeContent?->faq_items ?: [])->filter()
     ->map(fn ($item) => (object) [
-      'title' => data_get($item, 'question'),
-      'description' => data_get($item, 'answer'),
+      'title' => $trans(data_get($item, 'question')),
+      'description' => $trans(data_get($item, 'answer')),
     ]);
   if ($faqItems->isEmpty()) {
     $faqItems = $faqBlock?->items ?? collect();
@@ -105,11 +117,11 @@
     $heroSlides = collect($defaultHeroSlides);
   }
 
-  $heroTitle = $homeContent?->hero_title ?: $page?->hero_title ?: 'Empowering Digital Talent, Enabling Global Success';
-  $primaryCtaLabel = $homeContent?->hero_primary_cta_label ?: 'Explore Services';
-  $secondaryCtaLabel = $homeContent?->hero_secondary_cta_label ?: 'Free Consultation';
-  $primaryCtaUrl = $normalizeUrl($homeContent?->hero_primary_cta_url, route('services'));
-  $secondaryCtaUrl = $normalizeUrl($homeContent?->hero_secondary_cta_url, route('contact'));
+  $heroTitle = $trans($homeContent?->hero_title, $page?->hero_title ?: 'Empowering Digital Talent, Enabling Global Success');
+  $primaryCtaLabel = $trans($homeContent?->hero_primary_cta_label, 'Explore Services');
+  $secondaryCtaLabel = $trans($homeContent?->hero_secondary_cta_label, 'Free Consultation');
+  $primaryCtaUrl = $normalizeUrl($trans($homeContent?->hero_primary_cta_url), route('services'));
+  $secondaryCtaUrl = $normalizeUrl($trans($homeContent?->hero_secondary_cta_url), route('contact'));
 @endphp
 <style>
 
@@ -555,8 +567,8 @@
             <div class="hero-proof-grid mt-8 max-w-2xl" data-hero-item="cta">
               @forelse ($heroProofItems as $proofItem)
                 <div class="hero-proof-item">
-                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/70">{{ data_get($proofItem, 'label') }}</p>
-                  <p class=" text-[1.4rem] font-black leading-tight text-white sm:text-[1.5rem]mt-4">{{ data_get($proofItem, 'value') }}</p>
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/70">{{ $trans(data_get($proofItem, 'label')) }}</p>
+                  <p class=" text-[1.4rem] font-black leading-tight text-white sm:text-[1.5rem]mt-4">{{ $trans(data_get($proofItem, 'value')) }}</p>
                 </div>
               @empty
                 <div class="hero-proof-item">
@@ -596,8 +608,8 @@
         <div class="mx-auto max-w-7xl px-4">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $homeContent?->core_values_kicker ?: 'Core Values' }}</p>
-              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $homeContent?->core_values_title ?: $coreValuesBlock?->section_title ?: 'The values shaping how DigiTalent works.' }}</h2>
+              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $trans($homeContent?->core_values_kicker, 'Core Values') }}</p>
+              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $trans($homeContent?->core_values_title, $coreValuesBlock?->section_title ?: 'The values shaping how DigiTalent works.') }}</h2>
             </div>
           </div>
 
@@ -630,7 +642,7 @@
         <div class="mx-auto max-w-7xl px-4">
           <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-orange">{{ $homeContent?->progress_kicker ?: $progressCounterBlock?->section_title ?: 'Progress Counter' }}</p>
+              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-orange">{{ $trans($homeContent?->progress_kicker, $progressCounterBlock?->section_title ?: 'Progress Counter') }}</p>
             </div>
           </div>
           <div class="stagger-group mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -660,8 +672,8 @@
         <div class="mx-auto max-w-7xl px-4">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $homeContent?->why_choose_kicker ?: 'Why Choose Us' }}</p>
-              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $homeContent?->why_choose_title ?: $whyChooseBlock?->section_title ?: 'A practical partner for talent development and digital execution.' }}</h2>
+              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $trans($homeContent?->why_choose_kicker, 'Why Choose Us') }}</p>
+              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $trans($homeContent?->why_choose_title, $whyChooseBlock?->section_title ?: 'A practical partner for talent development and digital execution.') }}</h2>
             </div>
           </div>
 
@@ -700,8 +712,8 @@
       <section class="reveal bg-[linear-gradient(180deg,_rgba(236,248,255,0.92),_rgba(255,255,255,0.98))] py-14 sm:py-16 lg:py-20">
         <div class="mx-auto max-w-7xl px-4">
           <div class="mx-auto max-w-5xl">
-            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $homeContent?->faq_kicker ?: 'FAQ' }}</p>
-            <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $homeContent?->faq_title ?: $faqBlock?->section_title ?: 'Pertanyaan yang sering ditanyakan' }}</h2>
+            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $trans($homeContent?->faq_kicker, 'FAQ') }}</p>
+            <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $trans($homeContent?->faq_title, $faqBlock?->section_title ?: 'Pertanyaan yang sering ditanyakan') }}</h2>
             <div class="stagger-group mt-8 space-y-4">
               @forelse ($faqItems as $item)
                 <details class="faq-item interactive-card stagger-item rounded-[22px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft">

@@ -34,10 +34,23 @@ class HomeContent extends Model implements HasMedia
     protected function casts(): array
     {
         return [
+            'hero_title' => 'array',
+            'hero_subtitle' => 'array',
+            'hero_primary_cta_label' => 'array',
+            'hero_primary_cta_url' => 'array',
+            'hero_secondary_cta_label' => 'array',
+            'hero_secondary_cta_url' => 'array',
             'hero_proof_items' => 'array',
+            'core_values_kicker' => 'array',
+            'core_values_title' => 'array',
             'core_values_items' => 'array',
+            'progress_kicker' => 'array',
             'progress_items' => 'array',
+            'why_choose_kicker' => 'array',
+            'why_choose_title' => 'array',
             'why_choose_items' => 'array',
+            'faq_kicker' => 'array',
+            'faq_title' => 'array',
             'faq_items' => 'array',
         ];
     }
