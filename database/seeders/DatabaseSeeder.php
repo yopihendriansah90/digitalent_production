@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RoleSeeder::class);
         $this->call(CmsContentSeeder::class);
+        $this->call(HomeContentSeeder::class);
         $this->call(UserRoleSeeder::class);
 
         // User::factory(10)->create();

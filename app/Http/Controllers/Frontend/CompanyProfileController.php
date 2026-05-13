@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreContactInquiryRequest;
 use App\Models\ContactInquiry;
+use App\Models\HomeContent;
 use App\Services\Content\PageContentService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -17,7 +18,13 @@ class CompanyProfileController extends Controller
 
     public function home(): View
     {
-        return $this->renderCorePage('home', 'pages.home');
+        $content = $this->contentService->getPageContent('home');
+
+        return view('pages.home', [
+            'page' => $content['page'],
+            'sections' => $content['sections'],
+            'homeContent' => HomeContent::query()->first(),
+        ]);
     }
 
     public function about(): View

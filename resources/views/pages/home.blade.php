@@ -3,14 +3,66 @@
 @section('content')
 
 @php
+  $homeContent = $homeContent ?? null;
+
+  $normalizeUrl = function (?string $url, string $fallback): string {
+    if (! filled($url)) {
+      return $fallback;
+    }
+
+    if (str_starts_with($url, 'http://') || str_starts_with($url, 'https://') || str_starts_with($url, '/')) {
+      return $url;
+    }
+
+    return '/' . ltrim($url, '/');
+  };
+
   $coreValuesBlock = $sections['core_values'] ?? null;
-  $coreValuesItems = $coreValuesBlock?->items ?? collect();
+  $coreValuesItems = collect($homeContent?->core_values_items ?: [])->filter()
+    ->map(fn ($item) => (object) [
+      'title' => data_get($item, 'title'),
+      'description' => data_get($item, 'description'),
+      'extra' => [],
+    ]);
+  if ($coreValuesItems->isEmpty()) {
+    $coreValuesItems = $coreValuesBlock?->items ?? collect();
+  }
+
   $progressCounterBlock = $sections['progress_counter'] ?? null;
-  $progressCounterItems = $sections['progress_counter']->items ?? collect();
+  $progressCounterItems = collect($homeContent?->progress_items ?: [])->filter()
+    ->map(fn ($item) => (object) [
+      'title' => data_get($item, 'value'),
+      'description' => data_get($item, 'label'),
+      'extra' => [
+        'counter' => data_get($item, 'counter'),
+        'suffix' => data_get($item, 'suffix', '+'),
+      ],
+    ]);
+  if ($progressCounterItems->isEmpty()) {
+    $progressCounterItems = $progressCounterBlock?->items ?? collect();
+  }
+
   $whyChooseBlock = $sections['why_choose_us'] ?? null;
-  $whyChooseItems = $sections['why_choose_us']->items ?? collect();
+  $whyChooseItems = collect($homeContent?->why_choose_items ?: [])->filter()
+    ->map(fn ($item) => (object) [
+      'title' => data_get($item, 'title'),
+      'description' => data_get($item, 'description'),
+    ]);
+  if ($whyChooseItems->isEmpty()) {
+    $whyChooseItems = $whyChooseBlock?->items ?? collect();
+  }
+
   $faqBlock = $sections['cta'] ?? null;
-  $faqItems = $sections['cta']->items ?? collect();
+  $faqItems = collect($homeContent?->faq_items ?: [])->filter()
+    ->map(fn ($item) => (object) [
+      'title' => data_get($item, 'question'),
+      'description' => data_get($item, 'answer'),
+    ]);
+  if ($faqItems->isEmpty()) {
+    $faqItems = $faqBlock?->items ?? collect();
+  }
+
+  $heroProofItems = collect($homeContent?->hero_proof_items ?: [])->filter()->values();
 
   $defaultHeroSlides = [
     'https://smb.telkomuniversity.ac.id/wp-content/uploads/2024/08/Kegiatan-Mahasiswa-Selain-Kuliah-Ini-6-Rekomendasinya.jpg',
@@ -20,7 +72,17 @@
 
   $heroSlides = collect();
 
-  if ($page) {
+  if ($homeContent) {
+    $heroSlides = collect([
+      $homeContent->getFirstMediaUrl('hero_background_1'),
+      $homeContent->getFirstMediaUrl('hero_background_2'),
+      $homeContent->getFirstMediaUrl('hero_background_3'),
+    ])
+      ->filter()
+      ->values();
+  }
+
+  if ($heroSlides->isEmpty() && $page) {
     $heroSlides = collect([
       $page->getFirstMediaUrl('hero_image_1', 'web') ?: $page->getFirstMediaUrl('hero_image_1'),
       $page->getFirstMediaUrl('hero_image_2', 'web') ?: $page->getFirstMediaUrl('hero_image_2'),
@@ -42,6 +104,12 @@
   if ($heroSlides->isEmpty()) {
     $heroSlides = collect($defaultHeroSlides);
   }
+
+  $heroTitle = $homeContent?->hero_title ?: $page?->hero_title ?: 'Empowering Digital Talent, Enabling Global Success';
+  $primaryCtaLabel = $homeContent?->hero_primary_cta_label ?: 'Explore Services';
+  $secondaryCtaLabel = $homeContent?->hero_secondary_cta_label ?: 'Free Consultation';
+  $primaryCtaUrl = $normalizeUrl($homeContent?->hero_primary_cta_url, route('services'));
+  $secondaryCtaUrl = $normalizeUrl($homeContent?->hero_secondary_cta_url, route('contact'));
 @endphp
 <style>
 
@@ -479,20 +547,27 @@
         </div>
         <div class="hero-content mx-auto max-w-7xl px-4 py-10 sm:py-14 lg:py-24">
           <div>
-            <h1 class="max-w-4xl text-[2.25rem] font-black leading-[1.02] text-white sm:text-[2.9rem] lg:text-[4.1rem]" data-hero-item="title">{{ $page?->hero_title ?? 'Empowering Digital Talent, Enabling Global Success' }}</h1>
+            <h1 class="max-w-4xl text-[2.25rem] font-black leading-[1.02] text-white sm:text-[2.9rem] lg:text-[4.1rem]" data-hero-item="title">{{ $heroTitle }}</h1>
             <div class="mt-8 flex flex-col gap-3 sm:flex-row" data-hero-item="cta">
-              <a class="cta-button rounded-full bg-brand-blue px-6 py-3.5 text-center font-bold text-white shadow-soft hover:bg-brand-navy hover:text-white" href="{{ route('services') }}">Explore Services</a>
-              <a class="cta-button rounded-full border border-white/60 bg-white/20 px-6 py-3.5 text-center font-bold text-white hover:bg-white hover:text-brand-blue" href="{{ route('contact') }}">Free Consultation</a>
+              <a class="cta-button rounded-full bg-brand-blue px-6 py-3.5 text-center font-bold text-white shadow-soft hover:bg-brand-navy hover:text-white" href="{{ $primaryCtaUrl }}">{{ $primaryCtaLabel }}</a>
+              <a class="cta-button rounded-full border border-white/60 bg-white/20 px-6 py-3.5 text-center font-bold text-white hover:bg-white hover:text-brand-blue" href="{{ $secondaryCtaUrl }}">{{ $secondaryCtaLabel }}</a>
             </div>
             <div class="hero-proof-grid mt-8 max-w-2xl" data-hero-item="cta">
-              <div class="hero-proof-item">
-                <p class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/70">Core Services</p>
-                <p class=" text-[1.4rem] font-black leading-tight text-white sm:text-[1.5rem]mt-4">IT Training & IT Outsourcing</p>
-              </div>
-              <div class="hero-proof-item">
-                <p class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/70">Operating Standard</p>
-                <p class=" text-[1.4rem] font-black leading-tight text-white sm:text-[1.5rem]mt-4">Integrity, Professionalism, Quality</p>
-              </div>
+              @forelse ($heroProofItems as $proofItem)
+                <div class="hero-proof-item">
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/70">{{ data_get($proofItem, 'label') }}</p>
+                  <p class=" text-[1.4rem] font-black leading-tight text-white sm:text-[1.5rem]mt-4">{{ data_get($proofItem, 'value') }}</p>
+                </div>
+              @empty
+                <div class="hero-proof-item">
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/70">Core Services</p>
+                  <p class=" text-[1.4rem] font-black leading-tight text-white sm:text-[1.5rem]mt-4">IT Training & IT Outsourcing</p>
+                </div>
+                <div class="hero-proof-item">
+                  <p class="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-white/70">Operating Standard</p>
+                  <p class=" text-[1.4rem] font-black leading-tight text-white sm:text-[1.5rem]mt-4">Integrity, Professionalism, Quality</p>
+                </div>
+              @endforelse
             </div>
           </div>
 
@@ -521,8 +596,8 @@
         <div class="mx-auto max-w-7xl px-4">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Core Values</p>
-              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $coreValuesBlock?->section_title ?: 'The values shaping how DigiTalent works.' }}</h2>
+              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $homeContent?->core_values_kicker ?: 'Core Values' }}</p>
+              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $homeContent?->core_values_title ?: $coreValuesBlock?->section_title ?: 'The values shaping how DigiTalent works.' }}</h2>
             </div>
           </div>
 
@@ -555,7 +630,7 @@
         <div class="mx-auto max-w-7xl px-4">
           <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-orange">{{ $progressCounterBlock?->section_title ?: 'Progress Counter' }}</p>
+              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-orange">{{ $homeContent?->progress_kicker ?: $progressCounterBlock?->section_title ?: 'Progress Counter' }}</p>
             </div>
           </div>
           <div class="stagger-group mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -585,8 +660,8 @@
         <div class="mx-auto max-w-7xl px-4">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Why Choose Us</p>
-              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $whyChooseBlock?->section_title ?: 'A practical partner for talent development and digital execution.' }}</h2>
+              <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $homeContent?->why_choose_kicker ?: 'Why Choose Us' }}</p>
+              <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $homeContent?->why_choose_title ?: $whyChooseBlock?->section_title ?: 'A practical partner for talent development and digital execution.' }}</h2>
             </div>
           </div>
 
@@ -625,8 +700,8 @@
       <section class="reveal bg-[linear-gradient(180deg,_rgba(236,248,255,0.92),_rgba(255,255,255,0.98))] py-14 sm:py-16 lg:py-20">
         <div class="mx-auto max-w-7xl px-4">
           <div class="mx-auto max-w-5xl">
-            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">FAQ</p>
-            <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $faqBlock?->section_title ?: 'Pertanyaan yang sering ditanyakan' }}</h2>
+            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $homeContent?->faq_kicker ?: 'FAQ' }}</p>
+            <h2 class="mt-[30px] text-3xl font-black text-brand-blue lg:text-[2.7rem]">{{ $homeContent?->faq_title ?: $faqBlock?->section_title ?: 'Pertanyaan yang sering ditanyakan' }}</h2>
             <div class="stagger-group mt-8 space-y-4">
               @forelse ($faqItems as $item)
                 <details class="faq-item interactive-card stagger-item rounded-[22px] border border-brand-blue/15 bg-white/92 p-5 shadow-soft">
