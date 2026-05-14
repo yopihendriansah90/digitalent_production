@@ -2,7 +2,67 @@
 
 @section('content')
 @php
+  use Illuminate\Support\Facades\Storage;
+
+  $visionMissionContent = $visionMissionContent ?? null;
+  $activeLocale = request()->query('lang', app()->getLocale());
+  if (! in_array($activeLocale, ['id', 'en'], true)) {
+    $activeLocale = 'id';
+  }
+
+  $trans = function ($value, ?string $fallback = null) use ($activeLocale) {
+    if (is_array($value)) {
+      return data_get($value, $activeLocale) ?: data_get($value, 'id') ?: data_get($value, 'en') ?: $fallback;
+    }
+
+    return $value ?: $fallback;
+  };
+
+  $resolvePublicImage = function (?string $path): string {
+    if (empty($path)) {
+      return '';
+    }
+
+    if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+      return $path;
+    }
+
+    if (str_starts_with($path, '/')) {
+      return $path;
+    }
+
+    if (str_starts_with($path, 'template/')) {
+      return asset($path);
+    }
+
+    return Storage::url($path);
+  };
+
+  $visionSection = $sections['vision'] ?? null;
   $missionItems = $sections['mission_list']->items ?? collect();
+
+  if ($visionMissionContent) {
+    $heroTitle = $trans($visionMissionContent->hero_title, 'Vision & Mission');
+    $visionKicker = $trans($visionMissionContent->vision_kicker, 'Vision');
+    $visionText = $trans($visionMissionContent->vision_text, 'To be the leading strategic partner in developing and providing superior, innovative, and globally competitive digital talent to support international-standard digital transformation.');
+    $missionKicker = $trans($visionMissionContent->mission_kicker, 'Mission');
+    $missionItems = collect($visionMissionContent->mission_items ?? [])->map(fn ($item) => (object) [
+      'description' => $trans(data_get($item, 'body')),
+    ]);
+  } else {
+    $heroTitle = $page?->hero_title ?? 'Vision & Mission';
+    $visionKicker = 'Vision';
+    $visionText = $visionSection?->section_description ?? 'To be the leading strategic partner in developing and providing superior, innovative, and globally competitive digital talent to support international-standard digital transformation';
+    $missionKicker = 'Mission';
+  }
+
+  $heroBackgroundImage = $visionMissionContent?->getFirstMediaUrl('hero_background') ?: ($page?->getFirstMediaUrl('hero_image_1', 'web') ?: $page?->getFirstMediaUrl('hero_image_1'));
+  $heroStyle = "background-image: linear-gradient(135deg, rgba(236,248,255,0.96), rgba(255,255,255,0.98) 42%, rgba(127,215,255,0.22) 100%);";
+
+  if (! empty($heroBackgroundImage)) {
+    $safeHeroImage = str_replace(['"', "'"], ['%22', '%27'], $heroBackgroundImage);
+    $heroStyle = "background-image: linear-gradient(135deg, rgba(236,248,255,0.86), rgba(255,255,255,0.92) 42%, rgba(127,215,255,0.25) 100%), url('{$safeHeroImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;";
+  }
 @endphp
 <style>
 
@@ -15,8 +75,8 @@
           linear-gradient(180deg, #fafdff 0%, #ffffff 100%);
       }
       .reveal {
-        opacity: 1;
-        transform: translateY(0);
+        opacity: 0;
+        transform: translateY(24px);
         transition: opacity 700ms ease, transform 700ms ease;
       }
       .reveal.is-visible {
@@ -67,26 +127,26 @@
           transition: none !important;
         }
       }
-    
+
 </style>
 
 
-      <section class="section-shell border-b border-sky-100 bg-[linear-gradient(135deg,_rgba(236,248,255,0.96),_rgba(255,255,255,0.98)_42%,_rgba(127,215,255,0.22)_100%)] reveal">
+      <section class="section-shell border-b border-sky-100 reveal" style="{{ $heroStyle }}">
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-14 lg:py-16">
           <p class="text-sm font-medium text-slate-500"><a href="{{ route('home') }}" class="hover:text-brand-blue">Home</a> / Vision & Mission</p>
-          <h1 class="mt-5 max-w-4xl text-[2.1rem] font-black leading-[1.05] text-brand-blue sm:text-[2.7rem] lg:text-[3.5rem]">{{ $page?->hero_title ?? 'Vision & Mission' }}</h1>
+          <h1 class="mt-5 max-w-4xl text-[2.1rem] font-black leading-[1.05] text-brand-blue sm:text-[2.7rem] lg:text-[3.5rem]">{{ $heroTitle }}</h1>
         </div>
       </section>
 
       <section class="section-shell reveal bg-[linear-gradient(180deg,_rgba(255,255,255,0.94),_rgba(236,248,255,0.55))] py-14 sm:py-16 lg:py-20">
         <div class="mx-auto max-w-7xl space-y-8 px-4 lg:space-y-10">
           <article class="panel-card rounded-[28px] p-7 pt-8 sm:p-8 sm:pt-9">
-            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Vision</p>
-            <div class="mt-4 max-w-5xl text-[1.35rem] font-black leading-[1.5] text-brand-blue sm:text-[1.6rem] sm:leading-[1.55] [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $sections['vision']->section_description ?? 'To be the leading strategic partner in developing and providing superior, innovative, and globally competitive digital talent to support international-standard digital transformation' !!}</div>
+            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $visionKicker }}</p>
+            <div class="mt-4 max-w-5xl text-[1.35rem] font-black leading-[1.5] text-brand-blue sm:text-[1.6rem] sm:leading-[1.55] [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $visionText !!}</div>
           </article>
 
           <div class="panel-card rounded-[30px] p-6 pt-8 sm:p-7 sm:pt-9">
-            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">Mission</p>
+            <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $missionKicker }}</p>
             <div class="mt-5 grid gap-4 lg:grid-cols-2">
               @forelse ($missionItems as $index => $item)
                 <div class="rounded-2xl border border-brand-blue/15 bg-white/90 px-4 py-4 {{ $loop->last && $loop->count % 2 === 1 ? 'lg:col-span-2' : '' }}">
@@ -103,5 +163,27 @@
           </div>
         </div>
       </section>
-    
+
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          const revealElements = document.querySelectorAll('.reveal');
+          const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+          if (!reduceMotion && 'IntersectionObserver' in window) {
+            const revealObserver = new IntersectionObserver((entries) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-visible');
+                revealObserver.unobserve(entry.target);
+              });
+            }, { threshold: 0.16 });
+
+            revealElements.forEach((element) => revealObserver.observe(element));
+            return;
+          }
+
+          revealElements.forEach((element) => element.classList.add('is-visible'));
+        });
+      </script>
+
 @endsection

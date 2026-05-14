@@ -8,6 +8,7 @@ use App\Models\AboutContent;
 use App\Models\ContactInquiry;
 use App\Models\HomeContent;
 use App\Models\ServicesContent;
+use App\Models\VisionMissionContent;
 use App\Services\Content\PageContentService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -58,7 +59,13 @@ class CompanyProfileController extends Controller
 
     public function visionMission(): View
     {
-        return $this->renderCorePage('vision-mission', 'pages.vision-mission');
+        $content = $this->contentService->getPageContent('vision-mission');
+
+        return view('pages.vision-mission', [
+            'page' => $content['page'],
+            'sections' => $content['sections'],
+            'visionMissionContent' => VisionMissionContent::query()->first(),
+        ]);
     }
 
     public function portfolio(): View

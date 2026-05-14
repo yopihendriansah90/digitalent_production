@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         $this->call(HomeContentSeeder::class);
         $this->call(AboutContentSeeder::class);
         $this->call(ServicesContentSeeder::class);
+        $this->call(VisionMissionContentSeeder::class);
         $this->call(UserRoleSeeder::class);
 
         // User::factory(10)->create();
