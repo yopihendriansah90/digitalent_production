@@ -7,6 +7,7 @@ use App\Http\Requests\StoreContactInquiryRequest;
 use App\Models\AboutContent;
 use App\Models\ContactInquiry;
 use App\Models\HomeContent;
+use App\Models\ServicesContent;
 use App\Services\Content\PageContentService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -41,7 +42,13 @@ class CompanyProfileController extends Controller
 
     public function services(): View
     {
-        return $this->renderCorePage('services', 'pages.services');
+        $content = $this->contentService->getPageContent('services');
+
+        return view('pages.services', [
+            'page' => $content['page'],
+            'sections' => $content['sections'],
+            'servicesContent' => ServicesContent::query()->first(),
+        ]);
     }
 
     public function contact(): View

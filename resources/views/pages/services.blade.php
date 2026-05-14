@@ -4,6 +4,28 @@
 @php
   use Illuminate\Support\Facades\Storage;
 
+  $servicesContent = $servicesContent ?? null;
+  $activeLocale = request()->query('lang', app()->getLocale());
+  if (! in_array($activeLocale, ['id', 'en'], true)) {
+    $activeLocale = 'id';
+  }
+  $trans = function ($value, ?string $fallback = null) use ($activeLocale) {
+    if (is_array($value)) {
+      return data_get($value, $activeLocale) ?: data_get($value, 'id') ?: data_get($value, 'en') ?: $fallback;
+    }
+
+    return $value ?: $fallback;
+  };
+  $cleanSelectionText = function (?string $value): string {
+    if (! is_string($value)) {
+      return '';
+    }
+
+    $value = trim($value);
+
+    return preg_replace('/^\d+\s*/', '', $value) ?? $value;
+  };
+
   $introCardsBlock = $sections['services_intro_cards'] ?? null;
   $trainingBlock = $sections['training_blocks'] ?? null;
   $trainingDomainBlock = $sections['training_domain'] ?? null;
@@ -21,10 +43,93 @@
   $outsourcingBlockItems = $outsourcingBlock?->items ?? collect();
   $talentProfileItems = $talentProfilesBlock?->items ?? collect();
   $selectionProcessItems = $selectionProcessBlock?->items ?? collect();
-  $servicesHeroImage = $page?->getFirstMediaUrl('hero_image_1', 'web') ?: $page?->getFirstMediaUrl('hero_image_1');
+  $servicesHeroImage = $servicesContent?->getFirstMediaUrl('hero_background') ?: ($page?->getFirstMediaUrl('hero_image_1', 'web') ?: $page?->getFirstMediaUrl('hero_image_1'));
 
-  $trainingDomainItem = $trainingDomainItems->first();
-  $trainingDomainImage = $trainingDomainItem?->extra['image_path'] ?? '/template/Logo/assets/trainging.png';
+  if ($servicesContent) {
+    $introCards = collect($servicesContent->hero_cards ?? [])->map(fn ($item) => (object) [
+      'title' => $trans(data_get($item, 'title')),
+      'description' => $trans(data_get($item, 'body')),
+    ]);
+
+    $trainingBlock = (object) [
+      'is_active' => true,
+      'section_title' => $trans($servicesContent->training_kicker, 'IT Training'),
+      'section_subtitle' => $trans($servicesContent->training_title),
+      'section_description' => $trans($servicesContent->training_body),
+    ];
+    $trainingBlockItems = collect($servicesContent->training_overview_items ?? [])->map(fn ($item) => (object) [
+      'title' => $trans(data_get($item, 'title')),
+      'description' => $trans(data_get($item, 'body')),
+    ]);
+
+    $trainingDomainItem = (object) [
+      'kicker' => $trans($servicesContent->domain_kicker, 'Domain Training'),
+      'title' => $trans($servicesContent->domain_title, 'IT Training Domain'),
+      'description' => $trans($servicesContent->domain_body),
+      'extra' => [],
+    ];
+    $trainingDomainImage = $servicesContent->getFirstMediaUrl('domain_chart_image') ?: '/template/Logo/assets/trainging.png';
+
+    $mentoredLearningBlock = (object) [
+      'is_active' => true,
+      'section_title' => $trans($servicesContent->mentored_kicker, 'Mentored Learning'),
+      'section_description' => $trans($servicesContent->mentored_title),
+    ];
+    $mentoredCoverImage = $servicesContent->getFirstMediaUrl('mentored_cover_image') ?: 'https://www.sgi-asia.co.id/Activities/CSAS.jpg';
+    $mentoredCards = collect($servicesContent->mentored_items ?? [])->map(fn ($item) => (object) [
+      'title' => $trans(data_get($item, 'title')),
+      'description' => $trans(data_get($item, 'body')),
+      'extra' => [
+        'image_path' => data_get($item, 'icon'),
+      ],
+    ]);
+
+    $trainingSupportBlock = (object) ['is_active' => true];
+    $trainingSupportItems = collect($servicesContent->support_items ?? [])->map(fn ($item) => (object) [
+      'title' => $trans(data_get($item, 'title')),
+      'description' => $trans(data_get($item, 'body')),
+    ]);
+
+    $outsourcingBlock = (object) [
+      'is_active' => true,
+      'section_title' => $trans($servicesContent->outsourcing_kicker, 'IT Outsourcing'),
+      'section_subtitle' => $trans($servicesContent->outsourcing_title),
+      'section_description' => $trans($servicesContent->outsourcing_body),
+    ];
+    $outsourcingBlockItems = collect($servicesContent->outsourcing_overview_items ?? [])->map(fn ($item) => (object) [
+      'title' => $trans(data_get($item, 'title')),
+      'description' => $trans(data_get($item, 'body')),
+    ]);
+
+    $talentProfilesBlock = (object) [
+      'is_active' => true,
+      'section_title' => $trans($servicesContent->talent_kicker, 'Talent Profiles'),
+      'section_description' => $trans($servicesContent->talent_title),
+    ];
+    $talentProfileItems = collect($servicesContent->talent_profiles ?? [])->map(fn ($item) => (object) [
+      'title' => $trans(data_get($item, 'title')),
+      'description' => $trans(data_get($item, 'body')),
+      'extra' => [
+        'image_path' => data_get($item, 'icon'),
+      ],
+    ]);
+
+    $selectionProcessBlock = (object) [
+      'is_active' => true,
+      'section_title' => $cleanSelectionText($trans($servicesContent->selection_kicker, 'Professional Selection Process')),
+      'section_description' => $cleanSelectionText($trans($servicesContent->selection_title)),
+    ];
+    $selectionProcessItems = collect($servicesContent->selection_items ?? [])->map(fn ($item) => (object) [
+      'title' => $cleanSelectionText($trans(data_get($item, 'title'))),
+      'description' => $cleanSelectionText($trans(data_get($item, 'body'))),
+    ]);
+  }
+
+  if (! $servicesContent) {
+    $trainingDomainItem = $trainingDomainItems->first() ?: (object) [];
+    $trainingDomainItem->kicker = $trainingDomainItem->title ?? 'Domain Training';
+    $trainingDomainImage = $trainingDomainItem?->extra['image_path'] ?? '/template/Logo/assets/trainging.png';
+  }
   $resolvePublicImage = function (?string $path): string {
     if (empty($path)) {
       return '';
@@ -45,9 +150,11 @@
     return Storage::url($path);
   };
 
-  $mentoredCoverItem = $mentoredLearningItems->first();
-  $mentoredCoverImage = $mentoredCoverItem?->extra['image_path'] ?? 'https://www.sgi-asia.co.id/Activities/CSAS.jpg';
-  $mentoredCards = $mentoredLearningItems->slice(1)->take(5);
+  if (! $servicesContent) {
+    $mentoredCoverItem = $mentoredLearningItems->first();
+    $mentoredCoverImage = $mentoredCoverItem?->extra['image_path'] ?? 'https://www.sgi-asia.co.id/Activities/CSAS.jpg';
+    $mentoredCards = $mentoredLearningItems->slice(1)->take(5);
+  }
   $servicesHeroStyle = '';
 
   if (!empty($servicesHeroImage)) {
@@ -256,14 +363,20 @@
       .mentored-grid {
         display: grid;
         gap: 12px;
+        align-items: stretch;
       }
       .mentored-item {
         position: relative;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
         border-radius: 18px;
         border: 1px solid rgba(0, 154, 223, 0.14);
         background: #fff;
         padding: 18px 16px 16px;
+        min-height: 0;
+        height: auto;
         transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
       }
       .mentored-item::before {
@@ -284,15 +397,27 @@
       .mentored-item-title {
         color: #09468a;
       }
+      .selection-grid .mentored-item {
+        min-height: 0;
+        height: auto;
+      }
       .mentored-icon {
         width: 80px;
         height: 80px;
         object-fit: contain;
+        flex: 0 0 80px;
       }
       .talent-profile-icon {
         width: 80px;
         height: 80px;
         object-fit: contain;
+        flex: 0 0 80px;
+      }
+      .talent-profile-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        min-height: 240px;
       }
       .detail-copy {
         color: #51627c;
@@ -307,6 +432,7 @@
         }
         .profile-grid {
           grid-template-columns: repeat(4, minmax(0, 1fr));
+          align-items: stretch;
         }
         .selection-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -322,9 +448,6 @@
         }
         .learning-features-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-        .learning-feature-card.is-wide {
-          grid-column: span 2 / span 2;
         }
         .domain-chart-layout {
           grid-template-columns: 0.72fr 1.28fr;
@@ -361,7 +484,7 @@
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-14 lg:py-16">
           <div>
             <p class="text-sm font-medium text-slate-500" data-hero-item="crumb"><a href="{{ route('home') }}" class="hover:text-brand-blue">Home</a> / Services</p>
-            <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.04] text-brand-blue sm:text-[2.8rem] lg:text-[3.6rem]" data-hero-item="title">{{ $page?->hero_title ?? 'IT Training and IT Outsourcing' }}</h1>
+            <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.04] text-brand-blue sm:text-[2.8rem] lg:text-[3.6rem]" data-hero-item="title">{{ $servicesContent ? $trans($servicesContent->hero_title, 'IT Training and IT Outsourcing') : ($page?->hero_title ?? 'IT Training and IT Outsourcing') }}</h1>
             <div class="mt-8 grid max-w-3xl gap-4 sm:grid-cols-2">
               @forelse ($introCards as $card)
               <div class="rounded-[24px] border border-brand-blue/15 {{ $loop->first ? 'bg-white/92' : 'bg-brand-sky/90' }} px-5 py-5 shadow-soft">
@@ -398,7 +521,7 @@
           <div class="domain-chart-card reveal mt-8 rounded-[30px] p-5 sm:p-8">
             <div class="domain-chart-layout">
               <div class="max-w-xl">
-                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">Domain Training</p>
+                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em]">{{ $trainingDomainItem?->kicker ?: 'Domain Training' }}</p>
                 <h3 class="mt-[30px] text-2xl font-black text-brand-blue">{{ $trainingDomainItem?->title ?: 'IT Training Domain' }}</h3>
                 <div class="detail-copy mt-4 text-lg leading-8 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $trainingDomainItem?->description ?: 'DigiTalent accommodates a broad range of industry-relevant training domains to support both foundational capability building and specialized professional development.' !!}</div>
               </div>
@@ -411,31 +534,19 @@
           </div>
 
           <div class="learning-features-grid reveal mt-6">
-            <article class="learning-feature-card is-wide">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em] text-brand-blue">Fundamental to Advanced Training</p>
-              <p class="mt-3 text-lg leading-8 text-slate-700">We offer a specialized Mentored Learning system where professionals can learn with flexible schedules and affordable pricing, without compromising learning quality.</p>
-            </article>
-
-            <article class="learning-feature-card">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em] text-brand-blue">Mentored Learning</p>
-              <div class="feature-points text-[1.05rem] leading-7 text-slate-700">
-                <p class="feature-point">Direct Online Access: Interactive discussions with trainers.</p>
-                <p class="feature-point">Active Learning: Supported by virtual technology.</p>
-                <p class="feature-point">Hands-on Labs: Practical training environments.</p>
-                <p class="feature-point">Project-Based Assessments: Evaluation through real-work projects.</p>
-                <p class="feature-point">Real-World Scenarios: Equipped with case studies and industry examples.</p>
-              </div>
-            </article>
-
-            <article class="learning-feature-card">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em] text-brand-blue">Experienced Instructors</p>
-              <p class="mt-3 text-[1.05rem] leading-8 text-slate-700">Our learning process is guided by senior practitioners who are globally certified and have an average of over 5 years of teaching experience.</p>
-            </article>
-
-            <article class="learning-feature-card is-wide">
-              <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em] text-brand-blue">Flexible Delivery Methods</p>
-              <p class="mt-3 text-[1.05rem] leading-8 text-slate-700">We accommodate your needs through Public Classes (Online or Offline), Hybrid learning, Corporate In-House Training, and ODP (Office Development Program) tailored for your team.</p>
-            </article>
+            @forelse ($trainingBlockItems as $item)
+              <article class="learning-feature-card">
+                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em] text-brand-blue">{{ $item->title }}</p>
+                <div class="mt-3 text-[1.05rem] leading-8 text-slate-700 [&_p]:mb-2 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">
+                  {!! $item->description !!}
+                </div>
+              </article>
+            @empty
+              <article class="learning-feature-card">
+                <p class="kicker text-sm font-extrabold uppercase tracking-[0.18em] text-brand-blue">Fundamental to Advanced Training</p>
+                <p class="mt-3 text-lg leading-8 text-slate-700">We offer a specialized Mentored Learning system where professionals can learn with flexible schedules and affordable pricing, without compromising learning quality.</p>
+              </article>
+            @endforelse
           </div>
           @endif
 
@@ -544,7 +655,7 @@
             </div>
             <div class="profile-grid mt-6">
               @forelse ($talentProfileItems as $item)
-              <article class="section-card rounded-[24px] p-5">
+              <article class="section-card talent-profile-card rounded-[24px] p-5 h-full">
                 @if (!empty($item->extra['image_path']))
                 <img class="talent-profile-icon" src="{{ $resolvePublicImage($item->extra['image_path']) }}" alt="{{ $item->title }} icon" />
                 @endif
@@ -552,7 +663,7 @@
                 <p class="detail-copy mt-3 leading-7">{{ strip_tags($item->description) }}</p>
               </article>
               @empty
-              <article class="section-card rounded-[24px] p-5">
+              <article class="section-card talent-profile-card rounded-[24px] p-5 h-full">
                 <h4 class="text-xl font-black text-brand-blue">Dedicated IT Staff</h4>
                 <p class="detail-copy mt-3 leading-7">Programmers, Network Engineers, and Data Analysts ready for direct business deployment.</p>
               </article>
