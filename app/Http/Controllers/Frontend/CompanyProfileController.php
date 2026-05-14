@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreContactInquiryRequest;
+use App\Models\AboutContent;
 use App\Models\ContactInquiry;
 use App\Models\HomeContent;
 use App\Services\Content\PageContentService;
@@ -29,7 +30,13 @@ class CompanyProfileController extends Controller
 
     public function about(): View
     {
-        return $this->renderCorePage('about', 'pages.about');
+        $content = $this->contentService->getPageContent('about');
+
+        return view('pages.about', [
+            'page' => $content['page'],
+            'sections' => $content['sections'],
+            'aboutContent' => AboutContent::query()->first(),
+        ]);
     }
 
     public function services(): View

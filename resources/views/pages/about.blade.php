@@ -2,16 +2,40 @@
 
 @section('content')
 @php
+  $aboutContent = $aboutContent ?? null;
+  $activeLocale = request()->query('lang', app()->getLocale());
+  if (! in_array($activeLocale, ['id', 'en'], true)) {
+    $activeLocale = 'id';
+  }
+  $trans = function ($value, ?string $fallback = null) use ($activeLocale) {
+    if (is_array($value)) {
+      return data_get($value, $activeLocale) ?: data_get($value, 'id') ?: data_get($value, 'en') ?: $fallback;
+    }
+    return $value ?: $fallback;
+  };
+
   $snapshotItems = ($sections['snapshot']->items ?? collect())->keyBy(fn ($item) => strtolower((string) $item->badge));
   $snapshotFounded = $snapshotItems->get('founded');
   $snapshotGroup = $snapshotItems->get('group');
   $snapshotFocusOne = $snapshotItems->get('focus_1');
   $snapshotFocusTwo = $snapshotItems->get('focus_2');
-  $whoWeAreTitle = $sections['who_we_are']->section_title ?? 'Who We Are';
-  $whereWeComeFromTitle = $sections['where_we_come_from']->section_title ?? 'Where We Come From';
-  $commitmentTitle = $sections['commitment']->section_title ?? 'Our Commitment';
-  $snapshotSectionTitle = $sections['snapshot']->section_title ?? 'Business Focus';
-  $aboutPhotoUrl = $page?->getFirstMediaUrl('about_photo', 'web') ?: asset('template/Logo/about.jpeg');
+  $whoWeAreTitle = $trans($aboutContent?->who_we_are_title, $sections['who_we_are']->section_title ?? 'Who We Are');
+  $whereWeComeFromTitle = $trans($aboutContent?->where_we_come_from_title, $sections['where_we_come_from']->section_title ?? 'Where We Come From');
+  $commitmentTitle = $trans($aboutContent?->commitment_title, $sections['commitment']->section_title ?? 'Our Commitment');
+  $snapshotSectionTitle = $trans($aboutContent?->business_focus_title, $sections['snapshot']->section_title ?? 'Business Focus');
+  $aboutPhotoUrl = $aboutContent?->getFirstMediaUrl('about_photo') ?: ($page?->getFirstMediaUrl('about_photo', 'web') ?: asset('template/Logo/about.jpeg'));
+  $heroTitle = $trans($aboutContent?->hero_title, $page?->hero_title ?? 'Strategic partner for digital transformation through IT Training and IT Outsourcing.');
+  $whoWeAreBody = $trans($aboutContent?->who_we_are_body, $sections['who_we_are']->section_description ?? null);
+  $whereWeComeFromBody = $trans($aboutContent?->where_we_come_from_body, $sections['where_we_come_from']->section_description ?? null);
+  $commitmentBody = $trans($aboutContent?->commitment_body, $sections['commitment']->section_description ?? null);
+  $foundedLabel = $trans($aboutContent?->founded_label, $snapshotFounded?->title ?? 'Founded');
+  $foundedValue = $trans($aboutContent?->founded_value, $snapshotFounded?->description ?? 'Aug 2025');
+  $groupLabel = $trans($aboutContent?->group_label, $snapshotGroup?->title ?? 'Group');
+  $groupValue = $trans($aboutContent?->group_value, $snapshotGroup?->description ?? 'SGI Asia');
+  $focus1Title = $trans($aboutContent?->focus_1_title, $snapshotFocusOne?->title ?? 'IT Training');
+  $focus1Body = $trans($aboutContent?->focus_1_body, $snapshotFocusOne?->description ?? 'Structured learning, mentoring, certification preparation, and applied capability development.');
+  $focus2Title = $trans($aboutContent?->focus_2_title, $snapshotFocusTwo?->title ?? 'IT Outsourcing');
+  $focus2Body = $trans($aboutContent?->focus_2_body, $snapshotFocusTwo?->description ?? 'Trusted IT talent supply for project, operational, and long-term business needs.');
 @endphp
 <style>
 
@@ -89,7 +113,7 @@
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-14 lg:py-16">
           <p class="text-sm font-medium text-slate-500"><a href="{{ route('home') }}" class="hover:text-brand-blue">Home</a> / About Us</p>
           <div class="mt-5">
-            <h1 class="max-w-4xl text-[2.1rem] font-black leading-[1.05] text-brand-blue sm:text-[2.7rem] lg:text-[3.5rem]">{{ $page?->hero_title ?? 'Strategic partner for digital transformation through IT Training and IT Outsourcing.' }}</h1>
+            <h1 class="max-w-4xl text-[2.1rem] font-black leading-[1.05] text-brand-blue sm:text-[2.7rem] lg:text-[3.5rem]">{{ $heroTitle }}</h1>
           </div>
         </div>
       </section>
@@ -99,17 +123,17 @@
           <div class="space-y-6">
             <article class="panel-card rounded-[28px] p-7 pt-8 sm:p-8 sm:pt-9">
               <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $whoWeAreTitle }}</p>
-              <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $sections['who_we_are']->section_description ?? 'PT. Systech Talenta Digital (DigiTalent) is a technology company and strategic partner for digital transformation. We focus on two core services: IT Training and IT Outsourcing. We believe digital progress depends on skilled people who can adapt and perform in real environments.' !!}</div>
+              <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $whoWeAreBody ?? 'PT. Systech Talenta Digital (DigiTalent) is a technology company and strategic partner for digital transformation. We focus on two core services: IT Training and IT Outsourcing. We believe digital progress depends on skilled people who can adapt and perform in real environments.' !!}</div>
             </article>
 
             <article class="panel-card rounded-[28px] p-7 pt-8 sm:p-8 sm:pt-9">
               <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $whereWeComeFromTitle }}</p>
-              <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $sections['where_we_come_from']->section_description ?? 'DigiTalent is part of SGI Asia Group, an IT group established in 2013. We originated from the training division of PT. Systech Global Informasi and later became an independent company. With strong industry experience and networks, we address two key needs: developing competent professionals and providing industry-ready talent. Our goal is to connect industry demands with available skills through structured training and reliable outsourcing services.' !!}</div>
+              <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $whereWeComeFromBody ?? 'DigiTalent is part of SGI Asia Group, an IT group established in 2013. We originated from the training division of PT. Systech Global Informasi and later became an independent company. With strong industry experience and networks, we address two key needs: developing competent professionals and providing industry-ready talent. Our goal is to connect industry demands with available skills through structured training and reliable outsourcing services.' !!}</div>
             </article>
 
             <article class="panel-card rounded-[28px] p-7 pt-8 sm:p-8 sm:pt-9">
               <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $commitmentTitle }}</p>
-              <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $sections['commitment']->section_description ?? 'Our commitment is to bridge the gap between industry demands and talent availability. Through structured training programs and flexible, trusted outsourcing services, we empower individuals and organizations to excel in a competitive digital future.' !!}</div>
+              <div class="mt-4 text-lg leading-8 text-slate-600 [&_p]:mb-3 [&_ul]:ml-5 [&_ul]:list-disc [&_ol]:ml-5 [&_ol]:list-decimal">{!! $commitmentBody ?? 'Our commitment is to bridge the gap between industry demands and talent availability. Through structured training programs and flexible, trusted outsourcing services, we empower individuals and organizations to excel in a competitive digital future.' !!}</div>
             </article>
           </div>
 
@@ -118,12 +142,12 @@
 
             <div class="grid gap-4 sm:grid-cols-2">
               <div class="rounded-[24px] border border-brand-blue/15 bg-brand-sky/90 p-5">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $snapshotFounded?->title ?? 'Founded' }}</p>
-                <p class="mt-2 text-2xl font-black text-brand-navy">{{ $snapshotFounded?->description ?? 'Aug 2025' }}</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $foundedLabel }}</p>
+                <p class="mt-2 text-2xl font-black text-brand-navy">{{ $foundedValue }}</p>
               </div>
               <div class="rounded-[24px] border border-brand-blue/15 bg-white/95 p-5">
-                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $snapshotGroup?->title ?? 'Group' }}</p>
-                <p class="mt-2 text-2xl font-black text-brand-navy">{{ $snapshotGroup?->description ?? 'SGI Asia' }}</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">{{ $groupLabel }}</p>
+                <p class="mt-2 text-2xl font-black text-brand-navy">{{ $groupValue }}</p>
               </div>
             </div>
 
@@ -131,12 +155,12 @@
               <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $snapshotSectionTitle }}</p>
               <div class="mt-5 grid gap-3">
                 <div class="rounded-2xl border border-brand-blue/15 bg-white/90 px-4 py-4">
-                  <p class="text-lg font-bold text-brand-navy">{{ $snapshotFocusOne?->title ?? 'IT Training' }}</p>
-                  <p class="mt-1 leading-7 text-slate-600">{{ $snapshotFocusOne?->description ?? 'Structured learning, mentoring, certification preparation, and applied capability development.' }}</p>
+                  <p class="text-lg font-bold text-brand-navy">{{ $focus1Title }}</p>
+                  <p class="mt-1 leading-7 text-slate-600">{{ $focus1Body }}</p>
                 </div>
                 <div class="rounded-2xl border border-brand-blue/15 bg-white/90 px-4 py-4">
-                  <p class="text-lg font-bold text-brand-navy">{{ $snapshotFocusTwo?->title ?? 'IT Outsourcing' }}</p>
-                  <p class="mt-1 leading-7 text-slate-600">{{ $snapshotFocusTwo?->description ?? 'Trusted IT talent supply for project, operational, and long-term business needs.' }}</p>
+                  <p class="text-lg font-bold text-brand-navy">{{ $focus2Title }}</p>
+                  <p class="mt-1 leading-7 text-slate-600">{{ $focus2Body }}</p>
                 </div>
               </div>
             </div>
