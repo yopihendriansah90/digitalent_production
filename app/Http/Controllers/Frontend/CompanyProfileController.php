@@ -7,6 +7,7 @@ use App\Http\Requests\StoreContactInquiryRequest;
 use App\Models\AboutContent;
 use App\Models\ContactInquiry;
 use App\Models\HomeContent;
+use App\Models\PortfolioContent;
 use App\Models\ServicesContent;
 use App\Models\VisionMissionContent;
 use App\Services\Content\PageContentService;
@@ -70,7 +71,13 @@ class CompanyProfileController extends Controller
 
     public function portfolio(): View
     {
-        return $this->renderCorePage('portfolio', 'pages.portfolio');
+        $content = $this->contentService->getPageContent('portfolio');
+
+        return view('pages.portfolio', [
+            'page' => $content['page'],
+            'sections' => $content['sections'],
+            'portfolioContent' => PortfolioContent::query()->first(),
+        ]);
     }
 
     public function training(): View
