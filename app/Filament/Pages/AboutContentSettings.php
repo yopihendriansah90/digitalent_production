@@ -56,6 +56,13 @@ class AboutContentSettings extends Page implements HasForms
                                 Forms\Components\TextInput::make('hero_title.id')->label('Judul Hero (ID)')->required(),
                                 Forms\Components\TextInput::make('hero_title.en')->label('Hero Title (EN)')->required(),
                             ]),
+                            Forms\Components\SpatieMediaLibraryFileUpload::make('hero_background')
+                                ->collection('hero_background')
+                                ->label('Background Hero')
+                                ->helperText('Gambar latar untuk section hero halaman About. Rekomendasi rasio 16:9.')
+                                ->image()
+                                ->imageEditor()
+                                ->maxSize(4096),
                         ]),
                         Tab::make('Story')->schema([
                             Section::make('Who We Are')->schema([

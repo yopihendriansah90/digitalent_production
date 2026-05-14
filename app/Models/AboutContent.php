@@ -53,6 +53,7 @@ class AboutContent extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
+        $this->addMediaCollection('hero_background')->singleFile();
         $this->addMediaCollection('about_photo')->singleFile();
     }
 }
