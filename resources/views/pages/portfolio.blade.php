@@ -89,7 +89,14 @@
     ]);
   }
 
-  $groupedGalleryItems = $galleryItems->groupBy('year');
+  $groupedGalleryItems = $galleryItems
+    ->sortByDesc(function (array $item): int {
+      $year = (string) ($item['year'] ?? '');
+      $numericYear = (int) preg_replace('/\D+/', '', $year);
+
+      return $numericYear > 0 ? $numericYear : 0;
+    })
+    ->groupBy('year');
   $clientLogoSlidesDesktop = $clientLogos->chunk(16)->values();
   $clientLogoSlidesMobile = $clientLogos->chunk(6)->values();
 
@@ -208,6 +215,47 @@
         object-fit: cover;
         border-bottom: 1px solid rgba(15, 23, 42, 0.22);
       }
+      .gallery-year-chip {
+        border: 1px solid rgba(0, 154, 223, 0.24);
+        background: rgba(255, 255, 255, 0.92);
+        color: #0f2f55;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        transition: all 180ms ease;
+      }
+      .gallery-year-chip.is-active {
+        background: #009adf;
+        border-color: #009adf;
+        color: #fff;
+      }
+      .gallery-year-filters {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 4px;
+      }
+      .gallery-year-filters::-webkit-scrollbar {
+        display: none;
+      }
+      .gallery-year-filters .gallery-year-chip {
+        flex: 0 0 auto;
+      }
+      .gallery-card-body {
+        min-height: 94px;
+      }
+      .gallery-meta-desc-clamp {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
       @media (min-width: 1024px) {
         .clients-desktop-only {
           display: block;
@@ -217,6 +265,11 @@
         }
         .clients-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         .gallery-card-item { flex-basis: 260px; }
+        .gallery-year-filters {
+          flex-wrap: wrap;
+          overflow-x: visible;
+          padding-bottom: 0;
+        }
       }
 </style>
 
@@ -287,9 +340,15 @@
 <section class="bg-transparent py-14 lg:py-20">
   <div class="mx-auto max-w-7xl px-4">
     <h2 class="text-3xl font-black text-brand-blue">{{ $galleryHeading }}</h2>
+    <div class="mt-5 gallery-year-filters" id="gallery-year-filters">
+      <button type="button" class="gallery-year-chip is-active" data-gallery-filter="all">{{ $activeLocale === 'en' ? 'All' : 'Semua' }}</button>
+      @foreach ($groupedGalleryItems as $year => $items)
+      <button type="button" class="gallery-year-chip" data-gallery-filter="{{ $year }}">{{ $year }}</button>
+      @endforeach
+    </div>
 
     @foreach ($groupedGalleryItems as $year => $items)
-    <div class="mt-8">
+    <div class="mt-8 gallery-year-section" data-gallery-year="{{ $year }}">
       <h3 class="text-2xl font-bold text-slate-800">{{ $year }}</h3>
       <div class="gallery-track mt-4">
         @foreach ($items as $item)
@@ -297,9 +356,9 @@
           @if (!empty($item['image']))
             <img class="gallery-thumb" src="{{ $resolvePublicImage($item['image']) }}" alt="{{ $item['title'] }}" loading="lazy" />
           @endif
-          <div class="p-3">
+          <div class="p-3 gallery-card-body">
             <p class="text-[0.95rem] font-bold text-slate-800">{{ $item['title'] }}</p>
-            <p class="mt-1 text-sm text-slate-600">{{ $item['body'] }}</p>
+            <p class="mt-1 text-sm text-slate-600 gallery-meta-desc-clamp">{{ $item['body'] }}</p>
           </div>
         </article>
         @endforeach
@@ -311,6 +370,25 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    const galleryFilterButtons = document.querySelectorAll('[data-gallery-filter]');
+    const gallerySections = document.querySelectorAll('[data-gallery-year]');
+
+    galleryFilterButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const targetYear = button.getAttribute('data-gallery-filter');
+
+        galleryFilterButtons.forEach((chip) => {
+          chip.classList.toggle('is-active', chip === button);
+        });
+
+        gallerySections.forEach((section) => {
+          const year = section.getAttribute('data-gallery-year');
+          const isVisible = targetYear === 'all' || year === targetYear;
+          section.style.display = isVisible ? '' : 'none';
+        });
+      });
+    });
+
     const clientCarousels = document.querySelectorAll('.js-clients-carousel');
     clientCarousels.forEach((clientsCarousel) => {
       const clientsDots = clientsCarousel.parentElement.querySelector('.js-clients-dots');
