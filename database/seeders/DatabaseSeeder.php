@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(VisionMissionContentSeeder::class);
         $this->call(PortfolioContentSeeder::class);
         $this->call(TrainingContentSeeder::class);
+        $this->call(OutsourcingContentSeeder::class);
         $this->call(UserRoleSeeder::class);
 
         // User::factory(10)->create();

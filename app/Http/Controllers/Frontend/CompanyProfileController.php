@@ -7,6 +7,7 @@ use App\Http\Requests\StoreContactInquiryRequest;
 use App\Models\AboutContent;
 use App\Models\ContactInquiry;
 use App\Models\HomeContent;
+use App\Models\OutsourcingContent;
 use App\Models\PortfolioContent;
 use App\Models\ServicesContent;
 use App\Models\TrainingContent;
@@ -94,7 +95,13 @@ class CompanyProfileController extends Controller
 
     public function outsourcing(): View
     {
-        return $this->renderCorePage('outsourcing', 'pages.outsourcing');
+        $content = $this->contentService->getPageContent('outsourcing');
+
+        return view('pages.outsourcing', [
+            'page' => $content['page'],
+            'sections' => $content['sections'],
+            'outsourcingContent' => OutsourcingContent::query()->first(),
+        ]);
     }
 
     public function submitContact(StoreContactInquiryRequest $request): RedirectResponse
