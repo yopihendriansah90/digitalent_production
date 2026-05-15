@@ -58,11 +58,12 @@ class PortfolioContentSettings extends Page implements HasForms
                         Forms\Components\TextInput::make('clients_kicker.id')->label('Kicker Client (ID)')->required(),
                         Forms\Components\TextInput::make('clients_kicker.en')->label('Client Kicker (EN)')->required(),
                     ]),
-                    Forms\Components\Repeater::make('client_logos')->label('Logo Client')->
-                        schema([
-                            Forms\Components\TextInput::make('name')->label('Nama Client')->required(),
-                            Forms\Components\FileUpload::make('image')->label('Logo')->image()->disk('public')->directory('portfolio/client-logos')->columnSpanFull(),
-                        ])->columns(2),
+                    Forms\Components\Repeater::make('client_logos')->label('Logo Client')
+                        ->grid(3)
+                        ->schema([
+                            Forms\Components\FileUpload::make('image')->label('Logo')->image()->disk('public')->directory('portfolio/client-logos')->columnSpanFull()->required(),
+                            Forms\Components\TextInput::make('name')->label('Nama Client')->required()->columnSpanFull(),
+                        ])->columns(1),
                 ]),
                 Tab::make('Gallery')->schema([
                     Grid::make(2)->schema([

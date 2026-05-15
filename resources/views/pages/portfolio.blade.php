@@ -90,6 +90,8 @@
   }
 
   $groupedGalleryItems = $galleryItems->groupBy('year');
+  $clientLogoSlidesDesktop = $clientLogos->chunk(16)->values();
+  $clientLogoSlidesMobile = $clientLogos->chunk(6)->values();
 
   $heroBackgroundImage = $portfolioContent?->getFirstMediaUrl('hero_background') ?: ($page?->getFirstMediaUrl('hero_image_1', 'web') ?: $page?->getFirstMediaUrl('hero_image_1'));
   $heroStyle = "background-image: linear-gradient(135deg, rgba(236,248,255,0.96), rgba(255,255,255,0.98) 42%, rgba(127,215,255,0.22) 100%);";
@@ -111,6 +113,48 @@
         display: grid;
         gap: 20px;
         grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .clients-grid.mobile-grid {
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+      }
+      .clients-desktop-only {
+        display: none;
+      }
+      .clients-mobile-only {
+        display: block;
+      }
+      .clients-carousel {
+        display: flex;
+        gap: 18px;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .clients-carousel::-webkit-scrollbar {
+        display: none;
+      }
+      .clients-slide {
+        min-width: 100%;
+        scroll-snap-align: start;
+      }
+      .clients-dots {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+      .clients-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        border: 0;
+        background: rgba(9, 70, 138, 0.2);
+        transition: transform 180ms ease, background-color 180ms ease;
+      }
+      .clients-dot.is-active {
+        background: #009adf;
+        transform: scale(1.15);
       }
       .logo-card,
       .gallery-card-item {
@@ -165,6 +209,12 @@
         border-bottom: 1px solid rgba(15, 23, 42, 0.22);
       }
       @media (min-width: 1024px) {
+        .clients-desktop-only {
+          display: block;
+        }
+        .clients-mobile-only {
+          display: none;
+        }
         .clients-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
         .gallery-card-item { flex-basis: 260px; }
       }
@@ -189,16 +239,46 @@
   <div class="mx-auto max-w-7xl px-4">
     <p class="text-sm font-bold uppercase tracking-[0.22em] text-brand-blue">{{ $clientsKicker }}</p>
     <div class="mt-8 rounded-[30px] border border-brand-blue/14 bg-transparent p-4 sm:p-5 lg:p-6">
-      <div class="clients-grid">
-        @foreach ($clientLogos as $logo)
-        <article class="logo-card rounded-[22px] border border-brand-blue/14 bg-white p-5">
-          @if (!empty($logo['image']))
-            <img class="client-logo-img" src="{{ $resolvePublicImage($logo['image']) }}" alt="{{ $logo['name'] }} logo" loading="lazy" />
-          @else
-            <p class="text-center text-sm font-bold text-brand-blue">{{ $logo['name'] }}</p>
-          @endif
-        </article>
-        @endforeach
+      <div class="clients-mobile-only">
+        <div id="clients-carousel-mobile" class="clients-carousel js-clients-carousel">
+          @foreach ($clientLogoSlidesMobile as $slide)
+          <div class="clients-slide">
+            <div class="clients-grid mobile-grid">
+              @foreach ($slide as $logo)
+              <article class="logo-card rounded-[22px] border border-brand-blue/14 bg-white p-5">
+                @if (!empty($logo['image']))
+                  <img class="client-logo-img" src="{{ $resolvePublicImage($logo['image']) }}" alt="{{ $logo['name'] }} logo" loading="lazy" />
+                @else
+                  <p class="text-center text-sm font-bold text-brand-blue">{{ $logo['name'] }}</p>
+                @endif
+              </article>
+              @endforeach
+            </div>
+          </div>
+          @endforeach
+        </div>
+        <div id="clients-dots-mobile" class="clients-dots mt-6 js-clients-dots" aria-label="Client logo pagination mobile"></div>
+      </div>
+
+      <div class="clients-desktop-only">
+        <div id="clients-carousel-desktop" class="clients-carousel js-clients-carousel">
+          @foreach ($clientLogoSlidesDesktop as $slide)
+          <div class="clients-slide">
+            <div class="clients-grid">
+              @foreach ($slide as $logo)
+              <article class="logo-card rounded-[22px] border border-brand-blue/14 bg-white p-5">
+                @if (!empty($logo['image']))
+                  <img class="client-logo-img" src="{{ $resolvePublicImage($logo['image']) }}" alt="{{ $logo['name'] }} logo" loading="lazy" />
+                @else
+                  <p class="text-center text-sm font-bold text-brand-blue">{{ $logo['name'] }}</p>
+                @endif
+              </article>
+              @endforeach
+            </div>
+          </div>
+          @endforeach
+        </div>
+        <div id="clients-dots-desktop" class="clients-dots mt-6 js-clients-dots" aria-label="Client logo pagination desktop"></div>
       </div>
     </div>
   </div>
@@ -231,6 +311,51 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function () {
+    const clientCarousels = document.querySelectorAll('.js-clients-carousel');
+    clientCarousels.forEach((clientsCarousel) => {
+      const clientsDots = clientsCarousel.parentElement.querySelector('.js-clients-dots');
+      if (!clientsDots) return;
+
+      const slides = Array.from(clientsCarousel.querySelectorAll('.clients-slide'));
+      const dotButtons = slides.map((_, index) => {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'clients-dot' + (index === 0 ? ' is-active' : '');
+        dot.setAttribute('aria-label', 'Go to client slide ' + (index + 1));
+        dot.addEventListener('click', () => {
+          clientsCarousel.scrollTo({
+            left: clientsCarousel.clientWidth * index,
+            behavior: 'smooth',
+          });
+        });
+        clientsDots.appendChild(dot);
+        return dot;
+      });
+
+      const setActiveDot = () => {
+        const index = Math.round(clientsCarousel.scrollLeft / Math.max(1, clientsCarousel.clientWidth));
+        dotButtons.forEach((dot, i) => dot.classList.toggle('is-active', i === index));
+      };
+
+      clientsCarousel.addEventListener('scroll', setActiveDot, { passive: true });
+
+      clientsCarousel.addEventListener('wheel', (event) => {
+        if (clientsCarousel.scrollWidth <= clientsCarousel.clientWidth) {
+          return;
+        }
+
+        const delta = Math.abs(event.deltaY) > Math.abs(event.deltaX) ? event.deltaY : event.deltaX;
+        if (delta === 0) {
+          return;
+        }
+
+        event.preventDefault();
+        clientsCarousel.scrollLeft += delta;
+      }, { passive: false });
+
+      setActiveDot();
+    });
+
     const desktopMedia = window.matchMedia('(min-width: 1024px)');
     const tracks = document.querySelectorAll('.gallery-track');
 
