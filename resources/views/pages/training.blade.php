@@ -38,6 +38,7 @@
       'title' => $trans(data_get($item, 'title')),
       'description' => $trans(data_get($item, 'body')),
       'badge' => $trans(data_get($item, 'badge')),
+      'link' => data_get($item, 'link'),
     ]);
   }
 
@@ -48,6 +49,7 @@
   })->values();
 
   $heroBackgroundMode = $trainingContent?->hero_background_mode ?? 'color';
+  $showDomainNumbering = $trainingContent?->show_domain_numbering ?? true;
   $heroBackgroundImage = $trainingContent?->getFirstMediaUrl('hero_background') ?: ($page?->getFirstMediaUrl('hero_image_1', 'web') ?: $page?->getFirstMediaUrl('hero_image_1'));
   $heroStyle = 'background-image: linear-gradient(160deg, #f0a530 0%, #f4b651 46%, #f8cd85 100%);';
 
@@ -87,6 +89,13 @@
         border-color: rgba(0, 154, 223, 0.24);
         box-shadow: 0 24px 52px rgba(9, 70, 138, 0.12);
       }
+      .training-rich-copy ul {
+        margin-left: 1.1rem;
+        list-style: disc;
+      }
+      .training-rich-copy li + li {
+        margin-top: 0.3rem;
+      }
 </style>
 
 <section class="border-b border-brand-orange/30 py-14 lg:py-20" style="{{ $heroStyle }}">
@@ -110,16 +119,27 @@
     <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
       @forelse ($trainingDomainItems as $index => $item)
         <article class="training-card rounded-[26px] p-6 pt-7">
-          <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain {{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</p>
+          @if ($showDomainNumbering)
+            <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain {{ str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT) }}</p>
+          @endif
           <h2 class="mt-4 text-2xl font-black text-brand-blue">{{ $item->title }}</h2>
-          <p class="leading-7 mt-4 text-slate-600">{{ strip_tags((string) $item->description) }}</p>
-          @if (filled($item->badge))
-            <span class="mt-6 inline-flex text-sm font-bold text-brand-orange">{{ $item->badge }}</span>
+          <div class="training-rich-copy leading-7 mt-4 text-slate-600">{!! $item->description !!}</div>
+          @if (filled($item->badge) && filled($item->link))
+            <a
+              href="{{ $item->link }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-6 inline-flex items-center rounded-full border border-brand-orange bg-brand-orange px-4 py-2 text-sm font-bold text-white transition hover:border-brand-blue hover:bg-brand-blue hover:text-white"
+            >
+              <span>{{ $item->badge }}</span>
+            </a>
           @endif
         </article>
       @empty
         <article class="training-card rounded-[26px] p-6 pt-7">
-          <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain 01</p>
+          @if ($showDomainNumbering)
+            <p class="text-sm font-bold uppercase tracking-[0.2em] text-brand-blue">Domain 01</p>
+          @endif
           <h2 class="mt-4 text-2xl font-black text-brand-blue">GRC</h2>
           <p class="leading-7 mt-4 text-slate-600">Governance, Risk, & Compliance programs for security and regulatory readiness.</p>
         </article>

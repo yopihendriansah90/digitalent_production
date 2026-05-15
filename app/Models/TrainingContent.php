@@ -13,6 +13,7 @@ class TrainingContent extends Model implements HasMedia
     protected $fillable = [
         'hero_title',
         'hero_background_mode',
+        'show_domain_numbering',
         'hero_cards',
         'domains',
     ];
@@ -21,6 +22,7 @@ class TrainingContent extends Model implements HasMedia
     {
         return [
             'hero_title' => 'array',
+            'show_domain_numbering' => 'boolean',
             'hero_cards' => 'array',
             'domains' => 'array',
         ];

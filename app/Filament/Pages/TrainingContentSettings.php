@@ -70,16 +70,27 @@ class TrainingContentSettings extends Page implements HasForms
                         ])->columns(2),
                 ]),
                 Tab::make('Domain Training')->schema([
+                    Forms\Components\Toggle::make('show_domain_numbering')
+                        ->label('Tampilkan Penomoran Domain')
+                        ->default(true)
+                        ->helperText('Jika nonaktif, label Domain 01/02/03 pada card akan disembunyikan di frontend.')
+                        ->columnSpanFull(),
                     Forms\Components\Repeater::make('domains')->label('Training Domains')
                         ->minItems(8)->maxItems(8)->defaultItems(8)
                         ->addable(false)->deletable(false)->reorderable(false)
                         ->schema([
                             Forms\Components\TextInput::make('title.id')->label('Title (ID)')->required(),
                             Forms\Components\TextInput::make('title.en')->label('Title (EN)')->required(),
-                            Forms\Components\Textarea::make('body.id')->label('Body (ID)')->rows(2)->required(),
-                            Forms\Components\Textarea::make('body.en')->label('Body (EN)')->rows(2)->required(),
-                            Forms\Components\TextInput::make('badge.id')->label('Badge (ID)')->required(),
-                            Forms\Components\TextInput::make('badge.en')->label('Badge (EN)')->required(),
+                            Forms\Components\RichEditor::make('body.id')->label('Body (ID)')->required()->columnSpanFull(),
+                            Forms\Components\RichEditor::make('body.en')->label('Body (EN)')->required()->columnSpanFull(),
+                            Forms\Components\TextInput::make('badge.id')->label('Label Tombol (ID)')->required(),
+                            Forms\Components\TextInput::make('badge.en')->label('Button Label (EN)')->required(),
+                            Forms\Components\TextInput::make('link')
+                                ->label('Link Google Drive')
+                                ->url()
+                                ->nullable()
+                                ->columnSpanFull()
+                                ->helperText('Contoh: https://drive.google.com/...'),
                         ])->columns(2),
                 ]),
             ])->columnSpanFull(),
