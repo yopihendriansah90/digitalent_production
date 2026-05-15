@@ -9,6 +9,7 @@ use App\Models\ContactInquiry;
 use App\Models\HomeContent;
 use App\Models\PortfolioContent;
 use App\Models\ServicesContent;
+use App\Models\TrainingContent;
 use App\Models\VisionMissionContent;
 use App\Services\Content\PageContentService;
 use Illuminate\Contracts\View\View;
@@ -82,7 +83,13 @@ class CompanyProfileController extends Controller
 
     public function training(): View
     {
-        return $this->renderCorePage('training', 'pages.training');
+        $content = $this->contentService->getPageContent('training');
+
+        return view('pages.training', [
+            'page' => $content['page'],
+            'sections' => $content['sections'],
+            'trainingContent' => TrainingContent::query()->first(),
+        ]);
     }
 
     public function outsourcing(): View

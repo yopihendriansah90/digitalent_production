@@ -26,7 +26,7 @@
   $aboutPhotoUrl = $aboutContent?->getFirstMediaUrl('about_photo') ?: ($page?->getFirstMediaUrl('about_photo', 'web') ?: asset('template/Logo/about.jpeg'));
   $aboutHeroBgUrl = $aboutContent?->getFirstMediaUrl('hero_background');
   $heroSectionStyle = $aboutHeroBgUrl
-    ? "background-image: linear-gradient(135deg, rgba(236,248,255,0.88), rgba(255,255,255,0.92) 42%, rgba(127,215,255,0.28) 100%), url('{$aboutHeroBgUrl}'); background-size: cover; background-position: center;"
+    ? "background-image: linear-gradient(180deg, rgba(0,0,0,0.52), rgba(0,0,0,0.64)), url('{$aboutHeroBgUrl}'); background-size: cover; background-position: center;"
     : 'background-image: linear-gradient(135deg, rgba(236,248,255,0.96), rgba(255,255,255,0.98) 42%, rgba(127,215,255,0.22) 100%); background-size: cover; background-position: center;';
   $heroTitle = $trans($aboutContent?->hero_title, $page?->hero_title ?? 'Strategic partner for digital transformation through IT Training and IT Outsourcing.');
   $whoWeAreBody = $trans($aboutContent?->who_we_are_body, $sections['who_we_are']->section_description ?? null);

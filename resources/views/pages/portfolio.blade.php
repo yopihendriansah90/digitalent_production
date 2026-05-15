@@ -105,7 +105,7 @@
 
   if (! empty($heroBackgroundImage)) {
     $safeHeroImage = str_replace(['"', "'"], ['%22', '%27'], $heroBackgroundImage);
-    $heroStyle = "background-image: linear-gradient(135deg, rgba(236,248,255,0.86), rgba(255,255,255,0.92) 42%, rgba(127,215,255,0.25) 100%), url('{$safeHeroImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;";
+    $heroStyle = "background-image: linear-gradient(180deg, rgba(0,0,0,0.52), rgba(0,0,0,0.64)), url('{$safeHeroImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;";
   }
 @endphp
 <style>
