@@ -39,6 +39,8 @@
   $submitLabel = $trans(data_get($buttonLabels, 'submit'), 'Kirim Pertanyaan');
   $successMessage = $trans(data_get($buttonLabels, 'success'), 'Pesan Anda sudah terkirim. Tim kami akan segera menghubungi Anda.');
   $errorMessage = $trans(data_get($buttonLabels, 'error'), 'Mohon cek kembali input form Anda.');
+  $homeLabel = $activeLocale === 'en' ? 'Home' : 'Home';
+  $contactPageLabel = $activeLocale === 'en' ? 'Contact' : 'Kontak';
 @endphp
 <style>
       body {
@@ -71,22 +73,27 @@
         border-color: rgba(0, 154, 223, 0.24);
         box-shadow: 0 24px 52px rgba(9, 70, 138, 0.12);
       }
+      @media (max-width: 640px) {
+        .panel-card:hover {
+          transform: none;
+        }
+      }
 </style>
 
 <section class="border-b border-sky-100 bg-[linear-gradient(135deg,_rgba(236,248,255,0.96),_rgba(255,255,255,0.98)_42%,_rgba(127,215,255,0.22)_100%)] py-14 lg:py-20">
   <div class="mx-auto max-w-7xl px-4">
-    <p class="text-sm font-medium text-slate-500"><a href="{{ route('home') }}" class="hover:text-brand-blue">Home</a> / Contact</p>
-    <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.05] text-brand-blue sm:text-[2.8rem] lg:text-[3.5rem]">{{ $heroTitle }}</h1>
+    <p class="text-sm font-medium text-slate-500"><a href="{{ route('home') }}" class="hover:text-brand-blue">{{ $homeLabel }}</a> / {{ $contactPageLabel }}</p>
+    <h1 class="mt-5 max-w-4xl text-[1.9rem] font-black leading-[1.08] text-brand-blue sm:text-[2.8rem] lg:text-[3.5rem]">{{ $heroTitle }}</h1>
   </div>
 </section>
 
 <section class="bg-[linear-gradient(180deg,_rgba(255,255,255,0.94),_rgba(236,248,255,0.5))] py-14 lg:py-20">
   <div class="mx-auto grid max-w-7xl gap-8 px-4 lg:grid-cols-[0.9fr_1.1fr]">
     <div class="space-y-5">
-      <div class="panel-card rounded-[28px] p-6 pt-8">
-        <h2 class="text-2xl font-black text-brand-blue">{{ $contactTitle }}</h2>
+      <div class="panel-card rounded-[24px] p-5 pt-7 sm:rounded-[28px] sm:p-6 sm:pt-8">
+        <h2 class="text-xl font-black text-brand-blue sm:text-2xl">{{ $contactTitle }}</h2>
         @if ($contactInfoItems->isNotEmpty())
-          <div class="mt-5 space-y-4 leading-7 text-slate-600">
+          <div class="mt-5 space-y-4 text-[15px] leading-7 text-slate-600 sm:text-base">
             @foreach ($contactInfoItems as $item)
               <p>
                 <strong class="text-brand-navy">{{ $trans(data_get($item, 'label')) }}:</strong>
@@ -99,26 +106,26 @@
             @endforeach
           </div>
         @elseif ($contactInfoBlock?->items?->isNotEmpty())
-          <div class="mt-5 space-y-4 leading-7 text-slate-600">
+          <div class="mt-5 space-y-4 text-[15px] leading-7 text-slate-600 sm:text-base">
             @foreach ($contactInfoBlock->items as $item)
               <p><strong class="text-brand-navy">{{ $item->title }}:</strong> {{ $item->description }}</p>
             @endforeach
           </div>
         @else
-          <div class="mt-5 space-y-4 leading-7 text-slate-600">
-            <p><strong class="text-brand-navy">Phone:</strong> {{ $siteSetting->phone ?? '(+62) 21 522 4520' }}</p>
+          <div class="mt-5 space-y-4 text-[15px] leading-7 text-slate-600 sm:text-base">
+            <p><strong class="text-brand-navy">{{ $activeLocale === 'en' ? 'Phone' : 'Telepon' }}:</strong> {{ $siteSetting->phone ?? '(+62) 21 522 4520' }}</p>
             <p><strong class="text-brand-navy">Email:</strong> {{ $siteSetting->email ?? 'info@digitalent.co.id' }}</p>
             <p><strong class="text-brand-navy">Website:</strong> {{ $siteSetting->website_url ?? 'www.digitalent.co.id' }}</p>
-            <p><strong class="text-brand-navy">Address:</strong> {{ $siteSetting->address ?? 'Wisma Bumiputera Lantai 1, Jl. Jend. Sudirman Kav. 75 Jakarta Selatan 12910 Indonesia' }}</p>
+            <p><strong class="text-brand-navy">{{ $activeLocale === 'en' ? 'Address' : 'Alamat' }}:</strong> {{ $siteSetting->address ?? 'Wisma Bumiputera Lantai 1, Jl. Jend. Sudirman Kav. 75 Jakarta Selatan 12910 Indonesia' }}</p>
           </div>
         @endif
       </div>
     </div>
 
-    <form class="panel-card rounded-[30px] p-7 pt-8" method="POST" action="{{ route('contact.submit') }}">
+    <form class="panel-card rounded-[24px] p-5 pt-7 sm:rounded-[30px] sm:p-7 sm:pt-8" method="POST" action="{{ route('contact.submit') }}">
       @csrf
       <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
-      <h2 class="text-2xl font-black text-brand-blue">{{ $formTitle }}</h2>
+      <h2 class="text-xl font-black text-brand-blue sm:text-2xl">{{ $formTitle }}</h2>
       @if (session('success'))
         <p class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{{ $successMessage }}</p>
       @endif
@@ -157,7 +164,7 @@
           <textarea class="mt-2 h-36 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-brand-blue" name="message" placeholder="{{ $messagePlaceholder }}">{{ old('message') }}</textarea>
         </label>
       </div>
-      <button class="mt-6 inline-flex rounded-full bg-brand-orange px-6 py-3.5 font-bold text-brand-navy hover:bg-brand-navy hover:text-white" type="submit">{{ $submitLabel }}</button>
+      <button class="mt-6 inline-flex w-full justify-center rounded-full bg-brand-orange px-6 py-3.5 font-bold text-white hover:bg-brand-navy hover:text-white sm:w-auto" type="submit">{{ $submitLabel }}</button>
     </form>
   </div>
 </section>
