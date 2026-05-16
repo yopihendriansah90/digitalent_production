@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PortfolioContentSeeder::class);
         $this->call(TrainingContentSeeder::class);
         $this->call(OutsourcingContentSeeder::class);
+        $this->call(ContactContentSeeder::class);
         $this->call(UserRoleSeeder::class);
 
         // User::factory(10)->create();
