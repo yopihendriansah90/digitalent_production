@@ -28,6 +28,12 @@ class SiteSetting extends Model implements HasMedia
         'topbar_address_short',
         'consultation_label',
         'nav_labels',
+        'footer_description',
+        'footer_pages_title',
+        'footer_services_title',
+        'footer_contact_title',
+        'footer_service_links',
+        'footer_bottom_right_text',
     ];
 
     protected function casts(): array
@@ -37,6 +43,12 @@ class SiteSetting extends Model implements HasMedia
             'topbar_address_short' => 'array',
             'consultation_label' => 'array',
             'nav_labels' => 'array',
+            'footer_description' => 'array',
+            'footer_pages_title' => 'array',
+            'footer_services_title' => 'array',
+            'footer_contact_title' => 'array',
+            'footer_service_links' => 'array',
+            'footer_bottom_right_text' => 'array',
         ];
     }
 
@@ -45,6 +57,7 @@ class SiteSetting extends Model implements HasMedia
         $this->addMediaCollection('logo_light')->singleFile();
         $this->addMediaCollection('logo_dark')->singleFile();
         $this->addMediaCollection('favicon')->singleFile();
+        $this->addMediaCollection('whatsapp_icon')->singleFile();
     }
 
     public function registerMediaConversions(?Media $media = null): void
