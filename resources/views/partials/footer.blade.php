@@ -43,11 +43,11 @@
         ['id' => 'Project-Based IT Teams', 'en' => 'Project-Based IT Teams', 'route' => 'outsourcing'],
     ]);
 
-    $normalizeWhatsappToDigits = function (?string $value): string {
+    $normalizeIndonesianNumberToDigits = function (?string $value, string $default = '628131337687'): string {
         $raw = trim((string) $value);
 
         if ($raw === '') {
-            return '628131337687';
+            return $default;
         }
 
         if (preg_match('/^https?:\/\//i', $raw)) {
@@ -61,7 +61,7 @@
         $digits = preg_replace('/\D+/', '', $raw) ?? '';
 
         if ($digits === '') {
-            return '628131337687';
+            return $default;
         }
 
         if (str_starts_with($digits, '0')) {
@@ -75,7 +75,10 @@
         return $digits;
     };
 
-    $whatsappDigits = $normalizeWhatsappToDigits($siteSetting?->whatsapp);
+    $phoneDigits = $normalizeIndonesianNumberToDigits($siteSetting?->phone, '62215224520');
+    $phoneDisplay = '+' . $phoneDigits;
+    $whatsappDigits = $normalizeIndonesianNumberToDigits($siteSetting?->whatsapp, '628131337687');
+    $whatsappDisplay = '+' . $whatsappDigits;
 @endphp
 
 <style>
@@ -122,10 +125,10 @@
         <div>
             <h3 class="text-lg font-extrabold text-white">{{ $contactTitle }}</h3>
             <ul class="mt-4 space-y-3 text-white/84">
-                <li><span class="font-semibold text-white">{{ $activeLocale === 'en' ? 'Phone' : 'Telepon' }}:</span> <a href="tel:{{ preg_replace('/\D+/', '', (string) ($siteSetting?->phone ?? '+62215224520')) }}" class="transition hover:text-brand-cyan">{{ $siteSetting?->phone ?? '(+62) 21 522 4520' }}</a></li>
+                <li><span class="font-semibold text-white">{{ $activeLocale === 'en' ? 'Phone' : 'Telepon' }}:</span> <a href="tel:{{ $phoneDigits }}" class="transition hover:text-brand-cyan">{{ $phoneDisplay }}</a></li>
                 <li><span class="font-semibold text-white">Email:</span> <a href="mailto:{{ $siteSetting?->email ?? 'info@digitalent.co.id' }}" class="transition hover:text-brand-cyan">{{ $siteSetting?->email ?? 'info@digitalent.co.id' }}</a></li>
                 <li><span class="font-semibold text-white">Website:</span> <a href="{{ $siteSetting?->website_url ?? 'https://www.digitalent.co.id' }}" class="transition hover:text-brand-cyan">{{ parse_url($siteSetting?->website_url ?? 'https://www.digitalent.co.id', PHP_URL_HOST) ?? 'www.digitalent.co.id' }}</a></li>
-                <li><span class="font-semibold text-white">WhatsApp:</span> <a href="https://wa.me/{{ $whatsappDigits }}" class="transition hover:text-brand-cyan">{{ $siteSetting?->whatsapp ?? '+62 813 1337 687' }}</a></li>
+                <li><span class="font-semibold text-white">WhatsApp:</span> <a href="https://wa.me/{{ $whatsappDigits }}" class="transition hover:text-brand-cyan">{{ $whatsappDisplay }}</a></li>
                 <li class="max-w-[20rem]"><span class="font-semibold text-white">{{ $activeLocale === 'en' ? 'Address' : 'Alamat' }}:</span> {{ $siteSetting?->address ?? 'Wisma Bumiputera Lantai 1, Jl. Jend. Sudirman Kav. 75 Jakarta Selatan 12910 Indonesia' }}</li>
             </ul>
         </div>

@@ -17,6 +17,8 @@ class FooterSettingResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationLabel = 'Footer';
 
     protected static ?string $modelLabel = 'Footer Settings';
@@ -31,7 +33,13 @@ class FooterSettingResource extends Resource
             Forms\Components\Textarea::make('address')->rows(3),
             Forms\Components\TextInput::make('email')->email()->maxLength(255),
             Forms\Components\TextInput::make('phone')->maxLength(50),
-            Forms\Components\TextInput::make('whatsapp')->maxLength(50),
+            Forms\Components\TextInput::make('whatsapp')
+                ->maxLength(255)
+                ->rules([
+                    'nullable',
+                    'regex:/^((\+62|62|08)\d{8,13}|https?:\/\/(wa\.me|api\.whatsapp\.com)\/.+)$/i',
+                ])
+                ->helperText('Format didukung: +62812..., 0812..., 62812..., atau URL WhatsApp (wa.me / api.whatsapp.com).'),
             Forms\Components\TextInput::make('instagram_url')->url()->maxLength(255),
             Forms\Components\TextInput::make('linkedin_url')->url()->maxLength(255),
             Forms\Components\TextInput::make('website_url')->url()->maxLength(255),

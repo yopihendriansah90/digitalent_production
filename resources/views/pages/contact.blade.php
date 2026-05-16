@@ -50,6 +50,24 @@
     $contactHeroStyle = "background-image: url('{$safeHeroImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;";
   }
   $hasContactHeroImage = ! empty($contactHeroImage);
+  $normalizeIndonesianNumberToDigits = function (?string $value, string $default): string {
+    $digits = preg_replace('/\D+/', '', (string) $value) ?? '';
+    if ($digits === '') {
+      return $default;
+    }
+    if (str_starts_with($digits, '0')) {
+      return '62' . substr($digits, 1);
+    }
+    if (str_starts_with($digits, '8')) {
+      return '62' . $digits;
+    }
+    if (! str_starts_with($digits, '62')) {
+      return '62' . $digits;
+    }
+    return $digits;
+  };
+  $phoneDigits = $normalizeIndonesianNumberToDigits($siteSetting?->phone, '62215224520');
+  $phoneDisplay = '+' . $phoneDigits;
 @endphp
 <style>
       body {
@@ -137,7 +155,7 @@
           </div>
         @else
           <div class="mt-5 space-y-4 text-[15px] leading-7 text-slate-600 sm:text-base">
-            <p><strong class="text-brand-navy">{{ $activeLocale === 'en' ? 'Phone' : 'Telepon' }}:</strong> {{ $siteSetting->phone ?? '(+62) 21 522 4520' }}</p>
+            <p><strong class="text-brand-navy">{{ $activeLocale === 'en' ? 'Phone' : 'Telepon' }}:</strong> <a class="text-brand-blue hover:text-brand-navy" href="tel:{{ $phoneDigits }}">{{ $phoneDisplay }}</a></p>
             <p><strong class="text-brand-navy">Email:</strong> {{ $siteSetting->email ?? 'info@digitalent.co.id' }}</p>
             <p><strong class="text-brand-navy">Website:</strong> {{ $siteSetting->website_url ?? 'www.digitalent.co.id' }}</p>
             <p><strong class="text-brand-navy">{{ $activeLocale === 'en' ? 'Address' : 'Alamat' }}:</strong> {{ $siteSetting->address ?? 'Wisma Bumiputera Lantai 1, Jl. Jend. Sudirman Kav. 75 Jakarta Selatan 12910 Indonesia' }}</p>

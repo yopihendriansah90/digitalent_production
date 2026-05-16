@@ -19,6 +19,8 @@ class PageResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationLabel = 'Pages';
 
     protected static ?int $navigationSort = 10;

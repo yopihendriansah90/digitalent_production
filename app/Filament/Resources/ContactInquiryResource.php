@@ -17,6 +17,8 @@ class ContactInquiryResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-inbox-stack';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationLabel = 'Contact Inquiries';
 
     protected static ?int $navigationSort = 30;
