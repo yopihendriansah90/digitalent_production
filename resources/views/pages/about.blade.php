@@ -40,6 +40,9 @@
   $focus1Body = $trans($aboutContent?->focus_1_body, $snapshotFocusOne?->description ?? 'Structured learning, mentoring, certification preparation, and applied capability development.');
   $focus2Title = $trans($aboutContent?->focus_2_title, $snapshotFocusTwo?->title ?? 'IT Outsourcing');
   $focus2Body = $trans($aboutContent?->focus_2_body, $snapshotFocusTwo?->description ?? 'Trusted IT talent supply for project, operational, and long-term business needs.');
+  $homeLabel = 'Home';
+  $pageLabel = $activeLocale === 'en' ? 'About Us' : 'Tentang Kami';
+  $homeUrl = route('home', ['lang' => $activeLocale]);
 @endphp
 <style>
 
@@ -118,9 +121,9 @@
         style="{{ $heroSectionStyle }}"
       >
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-14 lg:py-16">
-          <p class="text-sm font-medium text-slate-500"><a href="{{ route('home') }}" class="hover:text-brand-blue">Home</a> / About Us</p>
+          <p class="text-sm font-medium text-slate-500"><a href="{{ $homeUrl }}" class="hover:text-brand-blue">{{ $homeLabel }}</a> / {{ $pageLabel }}</p>
           <div class="mt-5">
-            <h1 class="max-w-4xl text-[2.1rem] font-black leading-[1.05] text-brand-blue sm:text-[2.7rem] lg:text-[3.5rem]">{{ $heroTitle }}</h1>
+            <h1 class="max-w-4xl text-[2.15rem] font-black leading-[1.05] text-brand-blue sm:text-[2.8rem] lg:text-[3.5rem]">{{ $heroTitle }}</h1>
           </div>
         </div>
       </section>

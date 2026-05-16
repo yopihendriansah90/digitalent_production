@@ -3,9 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class ContactContent extends Model
+class ContactContent extends Model implements HasMedia
 {
+    use InteractsWithMedia;
+
     protected $fillable = [
         'hero_title',
         'contact_info_title',
@@ -27,5 +31,10 @@ class ContactContent extends Model
             'service_options' => 'array',
             'button_labels' => 'array',
         ];
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('hero_background')->singleFile();
     }
 }

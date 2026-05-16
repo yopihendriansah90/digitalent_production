@@ -44,6 +44,12 @@ class ContactContentSettings extends Page implements HasForms
                         Forms\Components\TextInput::make('hero_title.id')->label('Judul Hero (ID)')->required(),
                         Forms\Components\TextInput::make('hero_title.en')->label('Hero Title (EN)')->required(),
                     ]),
+                    Forms\Components\SpatieMediaLibraryFileUpload::make('hero_background')
+                        ->collection('hero_background')
+                        ->label('Background Hero')
+                        ->image()
+                        ->imageEditor()
+                        ->maxSize(4096),
                 ]),
                 Tab::make('Contact Info')->schema([
                     Grid::make(2)->schema([
@@ -57,11 +63,21 @@ class ContactContentSettings extends Page implements HasForms
                             Forms\Components\TextInput::make('label.en')->label('Label (EN)')->required(),
                             Forms\Components\TextInput::make('value.id')->label('Isi (ID)')->required(),
                             Forms\Components\TextInput::make('value.en')->label('Value (EN)')->required(),
-                            Forms\Components\TextInput::make('link')->label('Link (Opsional)')->url()->nullable()->columnSpanFull(),
+                            Forms\Components\TextInput::make('link')
+                                ->label('Link (Opsional)')
+                                ->nullable()
+                                ->rules([
+                                    'nullable',
+                                    'regex:/^(https?:\/\/|mailto:|tel:).+/i',
+                                ])
+                                ->helperText('Contoh: https://..., mailto:info@..., tel:+628...')
+                                ->columnSpanFull(),
                         ])
                         ->columns(2)
                         ->defaultItems(7)
                         ->minItems(1)
+                        ->addable(false)
+                        ->deletable(false)
                         ->reorderableWithButtons(),
                 ]),
                 Tab::make('Contact Form')->schema([
@@ -96,6 +112,8 @@ class ContactContentSettings extends Page implements HasForms
                         ->columns(2)
                         ->defaultItems(5)
                         ->minItems(1)
+                        ->addable(false)
+                        ->deletable(false)
                         ->reorderableWithButtons(),
                     Grid::make(2)->schema([
                         Forms\Components\TextInput::make('button_labels.submit.id')->label('Tombol Submit (ID)')->required(),

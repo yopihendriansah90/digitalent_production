@@ -161,6 +161,9 @@
     $safeHeroImage = str_replace(['"', "'"], ['%22', '%27'], $servicesHeroImage);
     $servicesHeroStyle = "background-image: url('{$safeHeroImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;";
   }
+  $homeLabel = 'Home';
+  $pageLabel = $activeLocale === 'en' ? 'Services' : 'Layanan';
+  $homeUrl = route('home', ['lang' => $activeLocale]);
 @endphp
 <style>
 
@@ -483,8 +486,8 @@
       >
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-14 lg:py-16">
           <div>
-            <p class="text-sm font-medium text-slate-500" data-hero-item="crumb"><a href="{{ route('home') }}" class="hover:text-brand-blue">Home</a> / Services</p>
-            <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.04] text-brand-blue sm:text-[2.8rem] lg:text-[3.6rem]" data-hero-item="title">{{ $servicesContent ? $trans($servicesContent->hero_title, 'IT Training and IT Outsourcing') : ($page?->hero_title ?? 'IT Training and IT Outsourcing') }}</h1>
+            <p class="text-sm font-medium text-slate-500" data-hero-item="crumb"><a href="{{ $homeUrl }}" class="hover:text-brand-blue">{{ $homeLabel }}</a> / {{ $pageLabel }}</p>
+            <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.05] text-brand-blue sm:text-[2.8rem] lg:text-[3.5rem]" data-hero-item="title">{{ $servicesContent ? $trans($servicesContent->hero_title, 'IT Training and IT Outsourcing') : ($page?->hero_title ?? 'IT Training and IT Outsourcing') }}</h1>
             <div class="mt-8 grid max-w-3xl gap-4 sm:grid-cols-2">
               @forelse ($introCards as $card)
               <div class="rounded-[24px] border border-brand-blue/15 {{ $loop->first ? 'bg-white/92' : 'bg-brand-sky/90' }} px-5 py-5 shadow-soft">

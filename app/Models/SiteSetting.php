@@ -24,7 +24,21 @@ class SiteSetting extends Model implements HasMedia
         'website_url',
         'copyright_text',
         'map_embed',
+        'topbar_working_hours',
+        'topbar_address_short',
+        'consultation_label',
+        'nav_labels',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'topbar_working_hours' => 'array',
+            'topbar_address_short' => 'array',
+            'consultation_label' => 'array',
+            'nav_labels' => 'array',
+        ];
+    }
 
     public function registerMediaCollections(): void
     {

@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RoleSeeder::class);
         $this->call(CmsContentSeeder::class);
+        $this->call(SiteSettingTopbarSeeder::class);
         $this->call(HomeContentSeeder::class);
         $this->call(AboutContentSeeder::class);
         $this->call(ServicesContentSeeder::class);

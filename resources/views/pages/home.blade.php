@@ -559,7 +559,7 @@
         </div>
         <div class="hero-content mx-auto max-w-7xl px-4 py-10 sm:py-14 lg:py-24">
           <div>
-            <h1 class="max-w-4xl text-[2.25rem] font-black leading-[1.02] text-white sm:text-[2.9rem] lg:text-[4.1rem]" data-hero-item="title">{{ $heroTitle }}</h1>
+            <h1 class="max-w-4xl text-[2.15rem] font-black leading-[1.05] text-white sm:text-[2.8rem] lg:text-[3.5rem]" data-hero-item="title">{{ $heroTitle }}</h1>
             <div class="mt-8 flex flex-col gap-3 sm:flex-row" data-hero-item="cta">
               <a class="cta-button rounded-full bg-brand-blue px-6 py-3.5 text-center font-bold text-white shadow-soft hover:bg-brand-navy hover:text-white" href="{{ $primaryCtaUrl }}">{{ $primaryCtaLabel }}</a>
               <a class="cta-button rounded-full border border-white/60 bg-white/20 px-6 py-3.5 text-center font-bold text-white hover:bg-white hover:text-brand-blue" href="{{ $secondaryCtaUrl }}">{{ $secondaryCtaLabel }}</a>

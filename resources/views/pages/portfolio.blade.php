@@ -107,6 +107,9 @@
     $safeHeroImage = str_replace(['"', "'"], ['%22', '%27'], $heroBackgroundImage);
     $heroStyle = "background-image: linear-gradient(180deg, rgba(0,0,0,0.52), rgba(0,0,0,0.64)), url('{$safeHeroImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;";
   }
+  $homeLabel = 'Home';
+  $pageLabel = $activeLocale === 'en' ? 'Client / Portfolio' : 'Klien / Portofolio';
+  $homeUrl = route('home', ['lang' => $activeLocale]);
 @endphp
 <style>
       body {
@@ -275,7 +278,7 @@
 
 <section class="border-b border-sky-100 py-14 lg:py-20" style="{{ $heroStyle }}">
   <div class="mx-auto max-w-7xl px-4">
-    <p class="text-sm font-medium text-slate-500"><a href="{{ route('home') }}" class="hover:text-brand-blue">Home</a> / Client / Portfolio</p>
+    <p class="text-sm font-medium text-slate-500"><a href="{{ $homeUrl }}" class="hover:text-brand-blue">{{ $homeLabel }}</a> / {{ $pageLabel }}</p>
     <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.05] text-brand-blue sm:text-[2.8rem] lg:text-[3.5rem]">{{ $heroTitle }}</h1>
     <div class="mt-8 grid max-w-3xl gap-4 sm:grid-cols-2">
       @foreach ($heroCards as $card)

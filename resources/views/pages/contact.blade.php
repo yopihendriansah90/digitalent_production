@@ -41,6 +41,15 @@
   $errorMessage = $trans(data_get($buttonLabels, 'error'), 'Mohon cek kembali input form Anda.');
   $homeLabel = $activeLocale === 'en' ? 'Home' : 'Home';
   $contactPageLabel = $activeLocale === 'en' ? 'Contact' : 'Kontak';
+  $homeUrl = route('home', ['lang' => $activeLocale]);
+  $contactHeroImage = $contactContent?->getFirstMediaUrl('hero_background') ?: ($page?->getFirstMediaUrl('hero_image_1', 'web') ?: $page?->getFirstMediaUrl('hero_image_1'));
+  $contactHeroStyle = "background-image: linear-gradient(135deg, rgba(236,248,255,0.96), rgba(255,255,255,0.98) 42%, rgba(127,215,255,0.22) 100%);";
+
+  if (! empty($contactHeroImage)) {
+    $safeHeroImage = str_replace(['"', "'"], ['%22', '%27'], $contactHeroImage);
+    $contactHeroStyle = "background-image: url('{$safeHeroImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;";
+  }
+  $hasContactHeroImage = ! empty($contactHeroImage);
 @endphp
 <style>
       body {
@@ -78,12 +87,27 @@
           transform: none;
         }
       }
+      .hero-entrance {
+        position: relative;
+        isolation: isolate;
+      }
+      .hero-entrance.has-image::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.52), rgba(0, 0, 0, 0.64));
+      }
+      .hero-entrance > .mx-auto {
+        position: relative;
+        z-index: 1;
+      }
 </style>
 
-<section class="border-b border-sky-100 bg-[linear-gradient(135deg,_rgba(236,248,255,0.96),_rgba(255,255,255,0.98)_42%,_rgba(127,215,255,0.22)_100%)] py-14 lg:py-20">
+<section class="hero-entrance {{ $hasContactHeroImage ? 'has-image' : '' }} border-b border-sky-100 py-14 lg:py-20" style="{{ $contactHeroStyle }}">
   <div class="mx-auto max-w-7xl px-4">
-    <p class="text-sm font-medium text-slate-500"><a href="{{ route('home') }}" class="hover:text-brand-blue">{{ $homeLabel }}</a> / {{ $contactPageLabel }}</p>
-    <h1 class="mt-5 max-w-4xl text-[1.9rem] font-black leading-[1.08] text-brand-blue sm:text-[2.8rem] lg:text-[3.5rem]">{{ $heroTitle }}</h1>
+    <p class="text-sm font-medium text-slate-500"><a href="{{ $homeUrl }}" class="hover:text-brand-blue">{{ $homeLabel }}</a> / {{ $contactPageLabel }}</p>
+    <h1 class="mt-5 max-w-4xl text-[2.15rem] font-black leading-[1.05] text-brand-blue sm:text-[2.8rem] lg:text-[3.5rem]">{{ $heroTitle }}</h1>
   </div>
 </section>
 
