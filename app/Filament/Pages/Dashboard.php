@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Filament\Widgets\ActiveVisitorsStatsWidget;
+use App\Filament\Widgets\VisitorHistoryChartWidget;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
@@ -19,6 +20,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             ActiveVisitorsStatsWidget::class,
+            VisitorHistoryChartWidget::class,
         ];
     }
 }
