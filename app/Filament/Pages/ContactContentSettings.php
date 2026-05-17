@@ -112,8 +112,7 @@ class ContactContentSettings extends Page implements HasForms
                         ->columns(2)
                         ->defaultItems(5)
                         ->minItems(1)
-                        ->addable(false)
-                        ->deletable(false)
+                        ->addActionLabel('Tambah Pilihan Layanan')
                         ->reorderableWithButtons(),
                     Grid::make(2)->schema([
                         Forms\Components\TextInput::make('button_labels.submit.id')->label('Tombol Submit (ID)')->required(),

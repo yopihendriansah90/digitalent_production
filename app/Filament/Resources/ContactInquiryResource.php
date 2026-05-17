@@ -17,27 +17,41 @@ class ContactInquiryResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-inbox-stack';
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static bool $shouldRegisterNavigation = true;
 
-    protected static ?string $navigationLabel = 'Contact Inquiries';
+    protected static ?string $navigationLabel = 'Pertanyaan Kontak';
+
+    protected static string | \UnitEnum | null $navigationGroup = 'Manajemen Konten';
 
     protected static ?int $navigationSort = 30;
+
+    public static function getModelLabel(): string
+    {
+        return 'Pertanyaan Kontak';
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return 'Pertanyaan Kontak';
+    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Forms\Components\TextInput::make('name')->required()->maxLength(255),
-            Forms\Components\TextInput::make('email')->required()->email()->maxLength(255),
-            Forms\Components\TextInput::make('service_type')->maxLength(255),
-            Forms\Components\Textarea::make('message')->required()->rows(5),
+            Forms\Components\TextInput::make('name')->label('Nama')->required()->maxLength(255),
+            Forms\Components\TextInput::make('email')->label('Email')->required()->email()->maxLength(255),
+            Forms\Components\TextInput::make('service_type')->label('Jenis Layanan')->maxLength(255),
+            Forms\Components\Textarea::make('message')->label('Pesan')->required()->rows(5),
             Forms\Components\Select::make('status')
+                ->label('Status')
                 ->required()
                 ->options([
-                    ContactInquiry::STATUS_NEW => 'new',
-                    ContactInquiry::STATUS_READ => 'read',
-                    ContactInquiry::STATUS_REPLIED => 'replied',
+                    ContactInquiry::STATUS_NEW => 'Baru',
+                    ContactInquiry::STATUS_READ => 'Dibaca',
+                    ContactInquiry::STATUS_REPLIED => 'Dibalas',
                 ]),
             Forms\Components\Select::make('assigned_to')
+                ->label('Ditugaskan Ke')
                 ->relationship('assignee', 'name')
                 ->searchable()
                 ->preload(),
@@ -49,23 +63,31 @@ class ContactInquiryResource extends Resource
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
-                Tables\Columns\TextColumn::make('name')->searchable(),
-                Tables\Columns\TextColumn::make('email')->searchable(),
-                Tables\Columns\TextColumn::make('service_type')->toggleable(),
-                Tables\Columns\BadgeColumn::make('status'),
-                Tables\Columns\TextColumn::make('assignee.name')->label('Assignee'),
-                Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
+                Tables\Columns\TextColumn::make('name')->label('Nama')->searchable(),
+                Tables\Columns\TextColumn::make('email')->label('Email')->searchable(),
+                Tables\Columns\TextColumn::make('service_type')->label('Jenis Layanan')->toggleable(),
+                Tables\Columns\BadgeColumn::make('status')
+                    ->label('Status')
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        ContactInquiry::STATUS_NEW => 'Baru',
+                        ContactInquiry::STATUS_READ => 'Dibaca',
+                        ContactInquiry::STATUS_REPLIED => 'Dibalas',
+                        default => ucfirst($state),
+                    }),
+                Tables\Columns\TextColumn::make('assignee.name')->label('Ditugaskan Ke'),
+                Tables\Columns\TextColumn::make('created_at')->label('Tanggal Masuk')->dateTime()->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
                     ->options([
-                        ContactInquiry::STATUS_NEW => 'new',
-                        ContactInquiry::STATUS_READ => 'read',
-                        ContactInquiry::STATUS_REPLIED => 'replied',
+                        ContactInquiry::STATUS_NEW => 'Baru',
+                        ContactInquiry::STATUS_READ => 'Dibaca',
+                        ContactInquiry::STATUS_REPLIED => 'Dibalas',
                     ]),
                 Tables\Filters\SelectFilter::make('assigned_to')
                     ->relationship('assignee', 'name')
-                    ->label('Assignee'),
+                    ->label('Ditugaskan Ke'),
             ])
             ->actions([
                 Actions\ViewAction::make(),
