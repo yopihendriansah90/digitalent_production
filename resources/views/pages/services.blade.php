@@ -155,9 +155,13 @@
     $mentoredCoverImage = $mentoredCoverItem?->extra['image_path'] ?? 'https://www.sgi-asia.co.id/Activities/CSAS.jpg';
     $mentoredCards = $mentoredLearningItems->slice(1)->take(5);
   }
-  $servicesHeroStyle = '';
+  $hasServicesHeroImage = ! empty($servicesHeroImage);
+  $servicesHeroStyle = "background:
+    radial-gradient(circle at top left, rgba(0, 154, 223, 0.10), transparent 28%),
+    radial-gradient(circle at top right, rgba(127, 215, 255, 0.16), transparent 32%),
+    linear-gradient(180deg, #fafdff 0%, #ffffff 100%);";
 
-  if (!empty($servicesHeroImage)) {
+  if ($hasServicesHeroImage) {
     $safeHeroImage = str_replace(['"', "'"], ['%22', '%27'], $servicesHeroImage);
     $servicesHeroStyle = "background-image: url('{$safeHeroImage}'); background-size: cover; background-position: center; background-repeat: no-repeat;";
   }
@@ -184,7 +188,7 @@
         position: relative;
         isolation: isolate;
       }
-      .hero-entrance::before {
+      .hero-entrance.has-hero-image::before {
         content: "";
         position: absolute;
         inset: 0;
@@ -481,7 +485,7 @@
 
 
       <section
-        class="hero-entrance overflow-hidden border-b border-sky-100"
+        class="hero-entrance {{ $hasServicesHeroImage ? 'has-hero-image' : '' }} overflow-hidden border-b border-sky-100"
         style="{{ $servicesHeroStyle }}"
       >
         <div class="mx-auto max-w-7xl px-4 py-12 sm:py-14 lg:py-16">
