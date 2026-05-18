@@ -6,6 +6,8 @@ use App\Services\Content\PageContentService;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Throwable;
+use Illuminate\Support\Facades\URL;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,5 +35,9 @@ class AppServiceProvider extends ServiceProvider
         } catch (Throwable) {
             View::share('siteSetting', null);
         }
+
+        if (app()->environment('production')) {
+        URL::forceScheme('https');
+    }
     }
 }
