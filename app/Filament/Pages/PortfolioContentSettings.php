@@ -19,11 +19,11 @@ class PortfolioContentSettings extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-building-office-2';
-    protected static ?string $navigationLabel = 'Konten Client / Portfolio';
-    protected static ?string $title = 'Edit Konten Client / Portfolio';
+    protected static ?string $navigationLabel = 'Client / Portfolio';
+    protected static ?string $title = 'Edit Client / Portfolio';
     protected static ?string $slug = 'content/portfolio';
-    protected static string | UnitEnum | null $navigationGroup = 'Manajemen Konten';
-    protected static ?int $navigationSort = 14;
+    protected static string | UnitEnum | null $navigationGroup = 'Konten Website';
+    protected static ?int $navigationSort = 5;
     protected string $view = 'filament.pages.home-content-settings';
 
     public ?array $data = [];
@@ -88,6 +88,6 @@ class PortfolioContentSettings extends Page implements HasForms
     {
         $this->record->update($this->form->getState());
 
-        Notification::make()->title('Konten Client / Portfolio berhasil diperbarui')->success()->send();
+        Notification::make()->title('Client / Portfolio berhasil diperbarui')->success()->send();
     }
 }

@@ -20,15 +20,15 @@ class HomeContentSettings extends Page implements HasForms
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-home-modern';
 
-    protected static ?string $navigationLabel = 'Konten Home';
+    protected static ?string $navigationLabel = 'Home';
 
-    protected static ?string $title = 'Edit Konten Home';
+    protected static ?string $title = 'Edit Home';
 
     protected static ?string $slug = 'content/home';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Manajemen Konten';
+    protected static string | UnitEnum | null $navigationGroup = 'Konten Website';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 1;
 
     protected string $view = 'filament.pages.home-content-settings';
 
@@ -413,7 +413,7 @@ class HomeContentSettings extends Page implements HasForms
         $this->record->update($state);
 
         Notification::make()
-            ->title('Konten Home berhasil diperbarui')
+            ->title('Home berhasil diperbarui')
             ->success()
             ->send();
     }

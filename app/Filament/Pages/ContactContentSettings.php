@@ -19,11 +19,11 @@ class ContactContentSettings extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-envelope';
-    protected static ?string $navigationLabel = 'Konten Contact';
-    protected static ?string $title = 'Edit Konten Contact';
+    protected static ?string $navigationLabel = 'Contact';
+    protected static ?string $title = 'Edit Contact';
     protected static ?string $slug = 'content/contact';
-    protected static string | UnitEnum | null $navigationGroup = 'Manajemen Konten';
-    protected static ?int $navigationSort = 17;
+    protected static string | UnitEnum | null $navigationGroup = 'Konten Website';
+    protected static ?int $navigationSort = 8;
     protected string $view = 'filament.pages.home-content-settings';
 
     public ?array $data = [];
@@ -131,6 +131,6 @@ class ContactContentSettings extends Page implements HasForms
     {
         $this->record->update($this->form->getState());
 
-        Notification::make()->title('Konten Contact berhasil diperbarui')->success()->send();
+        Notification::make()->title('Contact berhasil diperbarui')->success()->send();
     }
 }

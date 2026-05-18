@@ -23,9 +23,9 @@ class SiteSettingResource extends Resource
 
     protected static ?string $navigationLabel = 'Pengaturan Website';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Manajemen Konten';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengaturan';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema
     {

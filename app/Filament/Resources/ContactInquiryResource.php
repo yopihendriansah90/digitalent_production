@@ -21,9 +21,9 @@ class ContactInquiryResource extends Resource
 
     protected static ?string $navigationLabel = 'Pertanyaan Kontak';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Manajemen Konten';
+    protected static string | \UnitEnum | null $navigationGroup = 'Komunikasi';
 
-    protected static ?int $navigationSort = 30;
+    protected static ?int $navigationSort = 1;
 
     public static function getModelLabel(): string
     {

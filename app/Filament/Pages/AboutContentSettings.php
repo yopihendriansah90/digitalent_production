@@ -21,15 +21,15 @@ class AboutContentSettings extends Page implements HasForms
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-information-circle';
 
-    protected static ?string $navigationLabel = 'Konten About';
+    protected static ?string $navigationLabel = 'About';
 
-    protected static ?string $title = 'Edit Konten About';
+    protected static ?string $title = 'Edit About';
 
     protected static ?string $slug = 'content/about';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Manajemen Konten';
+    protected static string | UnitEnum | null $navigationGroup = 'Konten Website';
 
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 2;
 
     protected string $view = 'filament.pages.home-content-settings';
 
@@ -130,7 +130,7 @@ class AboutContentSettings extends Page implements HasForms
         $this->record->update($this->form->getState());
 
         Notification::make()
-            ->title('Konten About berhasil diperbarui')
+            ->title('About berhasil diperbarui')
             ->success()
             ->send();
     }

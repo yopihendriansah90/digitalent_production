@@ -19,11 +19,11 @@ class VisionMissionContentSettings extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-light-bulb';
-    protected static ?string $navigationLabel = 'Konten Vision & Mission';
-    protected static ?string $title = 'Edit Konten Vision & Mission';
+    protected static ?string $navigationLabel = 'Vision / Mission';
+    protected static ?string $title = 'Edit Vision / Mission';
     protected static ?string $slug = 'content/vision-mission';
-    protected static string | UnitEnum | null $navigationGroup = 'Manajemen Konten';
-    protected static ?int $navigationSort = 13;
+    protected static string | UnitEnum | null $navigationGroup = 'Konten Website';
+    protected static ?int $navigationSort = 4;
     protected string $view = 'filament.pages.home-content-settings';
 
     public ?array $data = [];
@@ -71,6 +71,6 @@ class VisionMissionContentSettings extends Page implements HasForms
     {
         $this->record->update($this->form->getState());
 
-        Notification::make()->title('Konten Vision & Mission berhasil diperbarui')->success()->send();
+        Notification::make()->title('Vision / Mission berhasil diperbarui')->success()->send();
     }
 }

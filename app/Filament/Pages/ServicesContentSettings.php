@@ -19,11 +19,11 @@ class ServicesContentSettings extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-briefcase';
-    protected static ?string $navigationLabel = 'Konten Services';
-    protected static ?string $title = 'Edit Konten Services';
+    protected static ?string $navigationLabel = 'Services';
+    protected static ?string $title = 'Edit Services';
     protected static ?string $slug = 'content/services';
-    protected static string | UnitEnum | null $navigationGroup = 'Manajemen Konten';
-    protected static ?int $navigationSort = 12;
+    protected static string | UnitEnum | null $navigationGroup = 'Konten Website';
+    protected static ?int $navigationSort = 3;
     protected string $view = 'filament.pages.home-content-settings';
 
     public ?array $data = [];
@@ -153,6 +153,6 @@ class ServicesContentSettings extends Page implements HasForms
     {
         $this->record->update($this->form->getState());
 
-        Notification::make()->title('Konten Services berhasil diperbarui')->success()->send();
+        Notification::make()->title('Services berhasil diperbarui')->success()->send();
     }
 }

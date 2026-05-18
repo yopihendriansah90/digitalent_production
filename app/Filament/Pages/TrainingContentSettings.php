@@ -19,11 +19,11 @@ class TrainingContentSettings extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-academic-cap';
-    protected static ?string $navigationLabel = 'Konten Training';
-    protected static ?string $title = 'Edit Konten Training';
+    protected static ?string $navigationLabel = 'Training';
+    protected static ?string $title = 'Edit Training';
     protected static ?string $slug = 'content/training';
-    protected static string | UnitEnum | null $navigationGroup = 'Manajemen Konten';
-    protected static ?int $navigationSort = 15;
+    protected static string | UnitEnum | null $navigationGroup = 'Konten Website';
+    protected static ?int $navigationSort = 6;
     protected string $view = 'filament.pages.home-content-settings';
 
     public ?array $data = [];
@@ -101,6 +101,6 @@ class TrainingContentSettings extends Page implements HasForms
     {
         $this->record->update($this->form->getState());
 
-        Notification::make()->title('Konten Training berhasil diperbarui')->success()->send();
+        Notification::make()->title('Training berhasil diperbarui')->success()->send();
     }
 }

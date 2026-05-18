@@ -19,11 +19,11 @@ class OutsourcingContentSettings extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
-    protected static ?string $navigationLabel = 'Konten Outsourcing';
-    protected static ?string $title = 'Edit Konten Outsourcing';
+    protected static ?string $navigationLabel = 'Outsourcing';
+    protected static ?string $title = 'Edit Outsourcing';
     protected static ?string $slug = 'content/outsourcing';
-    protected static string | UnitEnum | null $navigationGroup = 'Manajemen Konten';
-    protected static ?int $navigationSort = 16;
+    protected static string | UnitEnum | null $navigationGroup = 'Konten Website';
+    protected static ?int $navigationSort = 7;
     protected string $view = 'filament.pages.home-content-settings';
 
     public ?array $data = [];
@@ -104,6 +104,6 @@ class OutsourcingContentSettings extends Page implements HasForms
     {
         $this->record->update($this->form->getState());
 
-        Notification::make()->title('Konten Outsourcing berhasil diperbarui')->success()->send();
+        Notification::make()->title('Outsourcing berhasil diperbarui')->success()->send();
     }
 }
