@@ -15,5 +15,12 @@ class EditContactInquiry extends EditRecord
         return [
             Actions\DeleteAction::make(),
         ];
+
     }
+    // setleah berhasil di simpan kembali ke index table resource
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
 }

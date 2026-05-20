@@ -17,7 +17,7 @@ class UserRoleSeeder extends Seeder
             [
                 'name' => 'Super Admin DigiTalent',
                 'email' => 'superadmin@mail.com',
-                'password' => 'admin!',
+                'password' => 'admin',
                 'role' => 'super_admin',
             ],
             [
@@ -29,13 +29,13 @@ class UserRoleSeeder extends Seeder
             [
                 'name' => 'Editor DigiTalent',
                 'email' => 'editor@mail.com',
-                'password' => '88888888!',
+                'password' => 'admin',
                 'role' => 'editor',
             ],
             [
                 'name' => 'Viewer DigiTalent',
                 'email' => 'viewer@mail.com',
-                'password' => '88888888!',
+                'password' => 'admins',
                 'role' => 'viewer',
             ],
         ];

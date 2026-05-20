@@ -38,23 +38,51 @@ class ContactInquiryResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Forms\Components\TextInput::make('name')->label('Nama')->required()->maxLength(255),
-            Forms\Components\TextInput::make('email')->label('Email')->required()->email()->maxLength(255),
-            Forms\Components\TextInput::make('service_type')->label('Jenis Layanan')->maxLength(255),
-            Forms\Components\Textarea::make('message')->label('Pesan')->required()->rows(5),
-            Forms\Components\Select::make('status')
-                ->label('Status')
-                ->required()
-                ->options([
-                    ContactInquiry::STATUS_NEW => 'Baru',
-                    ContactInquiry::STATUS_READ => 'Dibaca',
-                    ContactInquiry::STATUS_REPLIED => 'Dibalas',
+            \Filament\Schemas\Components\Section::make('Informasi Pengirim')
+                ->description('Data identitas pengirim pertanyaan kontak.')
+                ->schema([
+                    Forms\Components\TextInput::make('name')
+                        ->label('Nama')
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('email')
+                        ->label('Email')
+                        ->required()
+                        ->email()
+                        ->maxLength(255),
+                    Forms\Components\TextInput::make('service_type')
+                        ->label('Jenis Layanan')
+                        ->maxLength(255)
+                        ->columnSpanFull(),
+                ])
+                ->columns(2),
+            \Filament\Schemas\Components\Section::make('Isi Pertanyaan')
+                ->description('Pesan utama yang dikirim oleh pengunjung.')
+                ->schema([
+                    Forms\Components\Textarea::make('message')
+                        ->label('Pesan')
+                        ->required()
+                        ->rows(6)
+                        ->columnSpanFull(),
                 ]),
-            Forms\Components\Select::make('assigned_to')
-                ->label('Ditugaskan Ke')
-                ->relationship('assignee', 'name')
-                ->searchable()
-                ->preload(),
+            \Filament\Schemas\Components\Section::make('Tindak Lanjut')
+                ->description('Atur status penanganan dan PIC yang bertanggung jawab.')
+                ->schema([
+                    Forms\Components\Select::make('status')
+                        ->label('Status')
+                        ->required()
+                        ->options([
+                            ContactInquiry::STATUS_NEW => 'Baru',
+                            ContactInquiry::STATUS_READ => 'Dibaca',
+                            ContactInquiry::STATUS_REPLIED => 'Dibalas',
+                        ]),
+                    Forms\Components\Select::make('assigned_to')
+                        ->label('Ditugaskan Ke')
+                        ->relationship('assignee', 'name')
+                        ->searchable()
+                        ->preload(),
+                ])
+                ->columns(2),
         ]);
     }
 
@@ -63,6 +91,10 @@ class ContactInquiryResource extends Resource
         return $table
             ->defaultSort('created_at', 'desc')
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex()
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('name')->label('Nama')->searchable(),
                 Tables\Columns\TextColumn::make('email')->label('Email')->searchable(),
                 Tables\Columns\TextColumn::make('service_type')->label('Jenis Layanan')->toggleable(),
