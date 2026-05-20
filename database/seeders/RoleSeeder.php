@@ -16,9 +16,12 @@ class RoleSeeder extends Seeder
         $this->bootstrapPermissionsBaseline();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        Role::query()->whereIn('name', ['panel_user', 'Super Admin', 'Content Admin', 'Editor', 'Viewer'])->where('guard_name', 'web')->delete();
+        Role::query()
+            ->whereIn('name', ['panel_user', 'Super Admin', 'Content Admin', 'Editor', 'Viewer', 'Admin'])
+            ->where('guard_name', 'web')
+            ->delete();
 
-        foreach (['super_admin', 'Admin', 'editor', 'viewer'] as $roleName) {
+        foreach (['super_admin', 'admin_content', 'editor', 'viewer'] as $roleName) {
             Role::findOrCreate($roleName, 'web');
         }
 
@@ -30,10 +33,11 @@ class RoleSeeder extends Seeder
         $superAdmin = Role::findByName('super_admin', 'web');
         $superAdmin->syncPermissions($allPermissions);
 
-        $contentAdmin = Role::findByName('Admin', 'web');
+        $contentAdmin = Role::findByName('admin_content', 'web');
         $contentAdminPermissions = Permission::query()
             ->where('guard_name', 'web')
             ->where('name', 'not like', '%:Role')
+            ->where('name', 'not like', '%:User')
             ->pluck('name')
             ->all();
         $contentAdmin->syncPermissions($contentAdminPermissions);
@@ -73,7 +77,7 @@ class RoleSeeder extends Seeder
 
     private function bootstrapPermissionsBaseline(): void
     {
-        $resources = ['ContactInquiry', 'FooterSetting', 'Page', 'Role', 'SectionBlock', 'SectionItem', 'SiteSetting'];
+        $resources = ['ContactInquiry', 'FooterSetting', 'Page', 'Role', 'SectionBlock', 'SectionItem', 'SiteSetting', 'User'];
         $actions = ['ViewAny', 'View', 'Create', 'Update', 'Delete', 'DeleteAny', 'Restore', 'RestoreAny', 'ForceDelete', 'ForceDeleteAny', 'Replicate', 'Reorder'];
 
         foreach ($resources as $resource) {

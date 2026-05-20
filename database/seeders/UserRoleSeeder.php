@@ -24,7 +24,7 @@ class UserRoleSeeder extends Seeder
                 'name' => 'Content Admin DigiTalent',
                 'email' => 'admin@mail.com',
                 'password' => 'admin',
-                'role' => 'Admin',
+                'role' => 'admin_content',
             ],
             [
                 'name' => 'Editor DigiTalent',

@@ -58,7 +58,7 @@ class RolePermissionMatrixTest extends TestCase
 
     public function test_content_admin_can_manage_content_and_inquiries_but_not_roles(): void
     {
-        $contentAdmin = Role::findByName('Admin', 'web');
+        $contentAdmin = Role::findByName('admin_content', 'web');
 
         $this->assertTrue($contentAdmin->hasPermissionTo('Create:Page'));
         $this->assertTrue($contentAdmin->hasPermissionTo('Delete:SectionItem'));
@@ -69,7 +69,7 @@ class RolePermissionMatrixTest extends TestCase
 
     public function test_bootstrap_authorization_roles_have_effective_permissions(): void
     {
-        $admin = Role::findByName('Admin', 'web');
+        $admin = Role::findByName('admin_content', 'web');
         $editor = Role::findByName('editor', 'web');
         $viewer = Role::findByName('viewer', 'web');
 
