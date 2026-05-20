@@ -3,6 +3,7 @@
 namespace App\Filament\Pages;
 
 use App\Models\HomeContent;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -404,6 +405,20 @@ class HomeContentSettings extends Page implements HasForms
                     ])
                     ->columnSpanFull(),
             ]);
+    }
+
+    /**
+     * @return array<int, Action>
+     */
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('save')
+                ->label('Simpan Perubahan')
+                ->icon('heroicon-o-check-circle')
+                ->color('primary')
+                ->action('save'),
+        ];
     }
 
     public function save(): void

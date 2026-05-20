@@ -2,8 +2,8 @@
     <form wire:submit="save" class="space-y-6">
         {{ $this->form }}
 
-        <div>
-            <x-filament::button type="submit">
+        <div class="mt-4">
+            <x-filament::button type="submit" icon="heroicon-o-check-circle">
                 Simpan Perubahan
             </x-filament::button>
         </div>
